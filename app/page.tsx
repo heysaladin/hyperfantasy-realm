@@ -19,7 +19,7 @@ export default function Home() {
               <Button variant="outline" className="border-white/20 hover:bg-white/10">
                 Contact
               </Button>
-              <Link href="/works" className="text-sm hover:text-white/60 transition">
+              <Link href="/projects" className="text-sm hover:text-white/60 transition">
                 Work
               </Link>
             </div>

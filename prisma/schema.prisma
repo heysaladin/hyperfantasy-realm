@@ -24,6 +24,10 @@ model Portfolio {
   isFeatured  Boolean   @default(false) @map("is_featured")
   orderIndex  Int       @default(0) @map("order_index")
   projectDate DateTime? @map("project_date") @db.Date
+  teamId          String?   @map("team_id") @db.Uuid
+  team            Team?     @relation(fields: [teamId], references: [id])
+  creatorId       String?   @map("creator_id") @db.Uuid
+  creator         Creator?  @relation(fields: [creatorId], references: [id])
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
@@ -66,8 +70,22 @@ model Team {
   avatarUrl  String?  @map("avatar_url")
   orderIndex Int      @default(0) @map("order_index")
   isVisible  Boolean  @default(true) @map("is_visible")
+  portfolios  Portfolio[]
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("teams")
+}
+
+model Creator {
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  role       String?
+  bio        String?
+  avatarUrl  String?     @map("avatar_url")
+  email      String?
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  portfolios Portfolio[]
+
+  @@map("creators")
 }
