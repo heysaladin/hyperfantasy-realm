@@ -8,71 +8,70 @@ datasource db {
 }
 
 model Portfolio {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String?
   imageUrl    String?   @map("image_url")
   liveUrl     String?   @map("live_url")
   githubUrl   String?   @map("github_url")
-  // Free-form tags (tech stack, project type, etc)
   tags        String[]
   stack       String[]
-  // Structured categories
-  complexity  String?   // 'short' or 'long'
-  category    String?   // 'illustration', 'ui-ux', 'development'
-  isVisible   Boolean   @default(false) @map("is_visible")
-  isFeatured  Boolean   @default(false) @map("is_featured")
-  orderIndex  Int       @default(0) @map("order_index")
+  isVisible   Boolean?  @default(false) @map("is_visible")
+  isFeatured  Boolean?  @default(false) @map("is_featured")
+  orderIndex  Int?      @default(0) @map("order_index")
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
   projectDate DateTime? @map("project_date") @db.Date
-  teamId          String?   @map("team_id") @db.Uuid
-  team            Team?     @relation(fields: [teamId], references: [id])
-  creatorId       String?   @map("creator_id") @db.Uuid
-  creator         Creator?  @relation(fields: [creatorId], references: [id])
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  complexity  String?
+  category    String?
+  teamId      String?   @map("team_id") @db.Uuid
+  creatorId   String?   @map("creator_id") @db.Uuid
+  creator     Creator?  @relation(fields: [creatorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  team        Team?     @relation(fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("portfolios")
 }
 
 model Blog {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
-  slug        String   @unique
+  slug        String    @unique
   content     String
   excerpt     String?
-  coverImage  String?  @map("cover_image")
+  coverImage  String?   @map("cover_image")
   tags        String[]
-  isPublished Boolean  @default(false) @map("is_published")
-  authorId    String?  @map("author_id") @db.Uuid
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  isPublished Boolean?  @default(false) @map("is_published")
+  authorId    String?   @map("author_id") @db.Uuid
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
+  creators    Creator?  @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blogs_author_id_fkey1")
 
   @@map("blogs")
 }
 
 model Enquiry {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
   email     String
   company   String?
   budget    String?
   message   String
-  status    String   @default("new")
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  status    String?   @default("new")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("enquiries")
 }
 
 model Team {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name       String
   bio        String?
-  avatarUrl  String?  @map("avatar_url")
-  orderIndex Int      @default(0) @map("order_index")
-  isVisible  Boolean  @default(true) @map("is_visible")
-  portfolios  Portfolio[]
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt  DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  avatarUrl  String?     @map("avatar_url")
+  orderIndex Int?        @default(0) @map("order_index")
+  isVisible  Boolean?    @default(true) @map("is_visible")
+  createdAt  DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime?   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  portfolios Portfolio[]
 
   @@map("teams")
 }
@@ -84,7 +83,8 @@ model Creator {
   bio        String?
   avatarUrl  String?     @map("avatar_url")
   email      String?
-  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdAt  DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
+  blogs      Blog[]
   portfolios Portfolio[]
 
   @@map("creators")

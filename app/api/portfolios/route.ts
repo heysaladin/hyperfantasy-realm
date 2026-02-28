@@ -21,46 +21,73 @@ export async function GET() {
 
 // CREATE portfolio
 export async function POST(request: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
-    console.log('POST started')
+    const body = await request.json()
+    console.log('=== RECEIVED BODY ===')
+    console.log('body.creatorId:', body.creatorId)
+    console.log('body.teamId:', body.teamId)
     
-    const supabase = await createClient()
-    console.log('Supabase client created')
-    
-    const { data: { user } } = await supabase.auth.getUser()
-    console.log('User:', user?.email || 'Not logged in')
-    
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    // Build data object
+    const data: any = {
+      title: body.title,
+      description: body.description || null,
+      imageUrl: body.imageUrl || null,
+      liveUrl: body.liveUrl || null,
+      githubUrl: body.githubUrl || null,
+      tags: Array.isArray(body.tags) ? body.tags : [],
+      stack: Array.isArray(body.stack) ? body.stack : [],
+      complexity: body.complexity || null,
+      category: body.category || null,
+      isVisible: Boolean(body.isVisible),
+      isFeatured: Boolean(body.isFeatured),
+      orderIndex: typeof body.orderIndex === 'number' ? body.orderIndex : 0,
+      projectDate: body.projectDate ? new Date(body.projectDate) : null,
     }
 
-    const body = await request.json()
-    console.log('Body received:', body)
+    // Add foreign keys - CRITICAL: Check for non-empty string
+    if (body.creatorId && body.creatorId !== '') {
+      console.log('Adding creatorId:', body.creatorId)
+      data.creatorId = body.creatorId
+    }
     
-    // Simplest possible create
+    if (body.teamId && body.teamId !== '') {
+      console.log('Adding teamId:', body.teamId)
+      data.teamId = body.teamId
+    }
+
+    console.log('=== DATA TO PRISMA ===')
+    console.log('data.creatorId:', data.creatorId)
+    console.log('data.teamId:', data.teamId)
+
     const portfolio = await prisma.portfolio.create({
-      data: {
-        title: body.title,
-        tags: body.tags || [],
-        stack: body.stack || [],
+      data,
+      include: {
+        creator: true,
+        team: true
       }
     })
     
-    console.log('Portfolio created:', portfolio.id)
+    console.log('=== CREATED PORTFOLIO ===')
+    console.log('portfolio.creatorId:', portfolio.creatorId)
+    console.log('portfolio.teamId:', portfolio.teamId)
+    console.log('portfolio.creator:', portfolio.creator)
     
-    return Response.json({ success: true, id: portfolio.id }, { status: 201 })
+    return Response.json(portfolio, { status: 201 })
     
   } catch (error: any) {
     console.error('=== POST ERROR ===')
-    console.error('Error name:', error.name)
-    console.error('Error message:', error.message)
-    console.error('Error stack:', error.stack)
-    console.error('==================')
-    
+    console.error('Error:', error)
+    console.error('Message:', error.message)
     return Response.json({ 
-      error: 'Server error',
-      details: error.message,
-      name: error.name
+      error: 'Failed to create portfolio',
+      details: error.message 
     }, { status: 500 })
   }
 }

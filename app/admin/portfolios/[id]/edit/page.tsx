@@ -95,7 +95,8 @@ export default function EditPortfolioPage({
         projectDate: formData.projectDate || null,
         isVisible: formData.isVisible,
         isFeatured: formData.isFeatured,
-        orderIndex: parseInt(formData.orderIndex.toString()) || 0
+        orderIndex: parseInt(formData.orderIndex.toString()) || 0,
+        creatorId: process.env.NEXT_PUBLIC_SUPER_CREATOR
       }
 
       const res = await fetch(`/api/portfolios/${id}`, {

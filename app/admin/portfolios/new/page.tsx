@@ -53,7 +53,7 @@ export default function NewPortfolioPage() {
         isFeatured: formData.isFeatured,
         orderIndex: parseInt(formData.orderIndex.toString()) || 0,
         teamId: null,
-        creatorId: null
+        creatorId: process.env.NEXT_PUBLIC_SUPER_CREATOR
         }
 
         console.log('Sending payload:', payload)

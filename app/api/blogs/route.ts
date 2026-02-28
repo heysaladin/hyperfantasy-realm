@@ -13,24 +13,50 @@ export async function GET() {
   }
 }
 
+// CREATE blog
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   try {
+    console.log('POST started')
+    
+    const supabase = await createClient()
+    console.log('Supabase client created')
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    console.log('User:', user?.email || 'Not logged in')
+    
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
+    console.log('Body received:', body)
+    
     const blog = await prisma.blog.create({
       data: {
-        ...body,
-        authorId: user.id
+        title: body.title,
+        slug: body.slug,
+        excerpt: body.excerpt || null,
+        content: body.content || null,
+        coverImage: body.coverImage || null,
+        tags: body.tags || [],
+        isPublished: body.isPublished || false,
+        authorId: body.authorId || null  // ← Add this line
       }
     })
-    return Response.json(blog)
-  } catch (error) {
-    return Response.json({ error: 'Failed to create blog' }, { status: 500 })
+    
+    console.log('Blog created:', blog.id)
+    console.log('Author ID:', blog.authorId)
+    
+    return Response.json(blog, { status: 201 })
+    
+  } catch (error: any) {
+    console.error('=== POST ERROR ===')
+    console.error('Error:', error.message)
+    console.error('==================')
+    
+    return Response.json({ 
+      error: 'Server error',
+      details: error.message
+    }, { status: 500 })
   }
 }

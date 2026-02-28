@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { ClientDate } from '@/components/client-date'  // ← Import
 
 async function getBlog(slug: string) {
-  return await prisma.blog.findUnique({
+  return await prisma.blog.findFirst({
     where: { slug, isPublished: true }
   })
 }
