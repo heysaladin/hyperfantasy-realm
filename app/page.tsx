@@ -13,7 +13,7 @@ export default function Home() {
               HYPERFANTASY
             </div>
             <div className="hidden md:flex items-center gap-8">
-              <a href="#work" className="text-sm hover:text-white/60 transition">Work</a>
+              <a href="#work" className="text-sm hover:text-white/60 transition">Works</a>
               <a href="#about" className="text-sm hover:text-white/60 transition">About</a>
               <a href="#services" className="text-sm hover:text-white/60 transition">Services</a>
               <Button variant="outline" className="border-white/20 hover:bg-white/10">
