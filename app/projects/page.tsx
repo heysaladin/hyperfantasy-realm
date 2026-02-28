@@ -160,6 +160,11 @@ export default function ProjectsPage() {
                     </Button>
                   </a>
                 )}
+                <Link href={`/projects/${selectedPortfolio.id}`}>
+                  <Button variant="default" size="sm">
+                    See Details
+                  </Button>
+                </Link>
               </div>
 
               {/* Description */}
