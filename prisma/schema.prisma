@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Portfolio {
@@ -44,7 +43,7 @@ model Blog {
   authorId    String?   @map("author_id") @db.Uuid
   createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
-  creators    Creator?  @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blogs_author_id_fkey1")
+  author      Creator?  @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blogs_author_id_fkey1")
 
   @@map("blogs")
 }
