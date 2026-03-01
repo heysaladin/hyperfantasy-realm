@@ -61,8 +61,8 @@ export default async function PortfolioDetailPage({
                 </Button>
               </a>
             )}
-            {portfolio.githubUrl && (
-              <a href={portfolio.githubUrl} target="_blank" rel="noopener noreferrer">
+            {portfolio.copyright && (
+              <a href={portfolio.copyright} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline">
                   <Github size={16} className="mr-2" />
                   View Code

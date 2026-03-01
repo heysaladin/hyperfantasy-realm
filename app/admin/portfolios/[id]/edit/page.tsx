@@ -23,7 +23,7 @@ export default function EditPortfolioPage({
     description: '',
     imageUrl: '',
     liveUrl: '',
-    githubUrl: '',
+    copyright: '',
     tags: '',
     stack: '',
     category: '',
@@ -53,7 +53,7 @@ export default function EditPortfolioPage({
           description: portfolio.description || '',
           imageUrl: portfolio.imageUrl || '',
           liveUrl: portfolio.liveUrl || '',
-          githubUrl: portfolio.githubUrl || '',
+          copyright: portfolio.copyright || '',
           tags: portfolio.tags?.join(', ') || '',
           stack: portfolio.stack?.join(', ') || '',
           category: portfolio.category || '',
@@ -83,7 +83,7 @@ export default function EditPortfolioPage({
         description: formData.description || null,
         imageUrl: formData.imageUrl || null,
         liveUrl: formData.liveUrl || null,
-        githubUrl: formData.githubUrl || null,
+        copyright: formData.copyright || null,
         tags: formData.tags 
           ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) 
           : [],
@@ -185,12 +185,12 @@ export default function EditPortfolioPage({
             />
           </div>
           <div>
-            <Label htmlFor="githubUrl">GitHub URL</Label>
+            <Label htmlFor="copyright">Copyright</Label>
             <Input
-              id="githubUrl"
+              id="copyright"
               type="url"
-              value={formData.githubUrl}
-              onChange={(e) => setFormData({...formData, githubUrl: e.target.value})}
+              value={formData.copyright}
+              onChange={(e) => setFormData({...formData, copyright: e.target.value})}
               className="bg-white/5 border-white/10"
             />
           </div>

@@ -18,7 +18,7 @@ export default function NewPortfolioPage() {
     // longDescription: '',
     imageUrl: '',
     liveUrl: '',
-    githubUrl: '',
+    copyright: '',
     tags: '',
     stack: '',
     category: '',
@@ -39,7 +39,7 @@ export default function NewPortfolioPage() {
         description: formData.description || null,
         imageUrl: formData.imageUrl || null,
         liveUrl: formData.liveUrl || null,
-        githubUrl: formData.githubUrl || null,
+        copyright: formData.copyright || null,
         tags: formData.tags 
             ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) 
             : [],
@@ -171,12 +171,12 @@ export default function NewPortfolioPage() {
             />
           </div>
           <div>
-            <Label htmlFor="githubUrl">GitHub URL</Label>
+            <Label htmlFor="copyright">Copyright</Label>
             <Input
-              id="githubUrl"
+              id="copyright"
               type="url"
-              value={formData.githubUrl}
-              onChange={(e) => setFormData({...formData, githubUrl: e.target.value})}
+              value={formData.copyright}
+              onChange={(e) => setFormData({...formData, copyright: e.target.value})}
               className="bg-white/5 border-white/10"
               placeholder="https://github.com/..."
             />

@@ -24,7 +24,7 @@ export async function PUT(
       description: body.description || null,
       imageUrl: body.imageUrl || null,
       liveUrl: body.liveUrl || null,
-      githubUrl: body.githubUrl || null,
+      copyright: body.copyright || null,
       tags: Array.isArray(body.tags) ? body.tags : [],
       stack: Array.isArray(body.stack) ? body.stack : [],
       complexity: body.complexity || null,

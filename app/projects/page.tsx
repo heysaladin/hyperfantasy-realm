@@ -152,8 +152,8 @@ export default function ProjectsPage() {
                     </Button>
                   </a>
                 )}
-                {selectedPortfolio.githubUrl && (
-                  <a href={selectedPortfolio.githubUrl} target="_blank" rel="noopener noreferrer">
+                {selectedPortfolio.copyright && (
+                  <a href={selectedPortfolio.copyright} target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" size="sm">
                       <Github size={16} className="mr-2" />
                       Code
