@@ -23,10 +23,10 @@ model Portfolio {
   projectDate DateTime? @map("project_date") @db.Date
   complexity  String?
   category    String?
-  creatorId String? @map("creator_id") @db.Uuid
-  creator   Creator? @relation(fields: [creatorId], references: [id])
-  teamId    String? @map("team_id") @db.Uuid
-  team      Team? @relation(fields: [teamId], references: [id])
+  teamId      String?   @map("team_id") @db.Uuid
+  creatorId   String?   @map("creator_id") @db.Uuid
+  creator     Creator?  @relation(fields: [creatorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  team        Team?     @relation(fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("portfolios")
 }

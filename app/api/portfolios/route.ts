@@ -12,10 +12,10 @@ export async function GET() {
         team: true
       }
     })
-    return Response.json(portfolios)
+    return Response.json(portfolios || [])
   } catch (error) {
     console.error('GET Error:', error)
-    return Response.json({ error: 'Failed to fetch portfolios' }, { status: 500 })
+    return Response.json([], { status: 200 })
   }
 }
 
