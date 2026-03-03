@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import { ArrowDownAZ, ArrowDownWideNarrow, ArrowUpNarrowWide, ExternalLink, Github, Image, LayoutGrid, Search, X } from 'lucide-react'
+import { Dialog as RadixDialog } from 'radix-ui'
+import { ArrowDownAZ, ArrowDownWideNarrow, ArrowUpNarrowWide, ExternalLink, Image, LayoutGrid, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { resolveContent, resolveContentAsText } from '@/lib/tiptap-content'
 import { ArticleContent } from '@/components/article-content'
@@ -295,68 +295,96 @@ export default function ProjectsPage() {
         )}
       </div>
 
-      {/* Modal */}
-      <Dialog open={!!selectedPortfolio} onOpenChange={() => setSelectedPortfolio(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-black border-slate-200 dark:border-white/20">
-          {selectedPortfolio && (
-            <div>
-              <DialogTitle className="sr-only">{selectedPortfolio.title}</DialogTitle>
+      {/* Shot modal — Dribbble style */}
+      <RadixDialog.Root open={!!selectedPortfolio} onOpenChange={() => setSelectedPortfolio(null)}>
+        <RadixDialog.Portal>
+          {/* Overlay */}
+          <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
 
-              {selectedPortfolio.imageUrl && (
-                <div className="aspect-video w-full overflow-hidden rounded-lg bg-slate-200 dark:bg-white/5 mb-6">
-                  <img src={selectedPortfolio.imageUrl} alt={selectedPortfolio.title} className="object-cover w-full h-full" />
-                </div>
-              )}
+          {/* Content wrapper */}
+          <RadixDialog.Content
+            aria-describedby={undefined}
+            className="fixed inset-0 z-50 flex items-start justify-center pt-10 px-4 pb-4 outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+          >
+            {selectedPortfolio && (
+              <>
+                <RadixDialog.Title className="sr-only">{selectedPortfolio.title}</RadixDialog.Title>
 
-              {selectedPortfolio.category && (
-                <span className="text-sm text-slate-500 dark:text-white/40 uppercase tracking-wider">{selectedPortfolio.category}</span>
-              )}
-              <h2 className="text-3xl font-bold mt-2 mb-4 text-slate-900 dark:text-white">{selectedPortfolio.title}</h2>
+                  {/* ── Info panel ── */}
+                  <div className="w-full max-w-4xl bg-white dark:bg-zinc-900 flex flex-col rounded-2xl overflow-hidden shadow-2xl max-h-[88vh]">
 
-              <div className="flex gap-3 mb-6">
-                {selectedPortfolio.liveUrl && (
-                  <a href={selectedPortfolio.liveUrl} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><ExternalLink size={16} className="mr-2" />Live Site</Button>
-                  </a>
-                )}
-                {selectedPortfolio.copyright && (
-                  <a href={selectedPortfolio.copyright} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Github size={16} className="mr-2" />Code</Button>
-                  </a>
-                )}
-                <Link href={`/projects/${selectedPortfolio.id}`}>
-                  <Button variant="default" size="sm">See Details</Button>
-                </Link>
-              </div>
+                    {/* Panel header */}
+                    <div className="flex items-start justify-between gap-3 px-8 py-4 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
+                      <div className="min-w-0">
+                        {selectedPortfolio.category && (
+                          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-1">
+                            {selectedPortfolio.category}
+                          </p>
+                        )}
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white leading-snug">
+                          {selectedPortfolio.title}
+                        </h2>
+                      </div>
+                      <RadixDialog.Close className="flex-shrink-0 p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:text-white/40 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition">
+                        <X size={20} />
+                      </RadixDialog.Close>
+                    </div>
 
-              <ArticleContent html={resolveContent(selectedPortfolio.description)}
-                className="prose prose-slate dark:prose-invert prose-sm max-w-none mb-6" />
+                    {/* Scrollable body */}
+                    <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6 min-h-0">
 
-              {selectedPortfolio.stack?.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-3">Tech Stack</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPortfolio.stack.map((tech: string) => (
-                      <span key={tech} className="px-3 py-1 bg-slate-200 dark:bg-white/10 rounded text-sm">{tech}</span>
-                    ))}
+                      {selectedPortfolio.description && (
+                        <ArticleContent
+                          html={resolveContent(selectedPortfolio.description)}
+                          className="prose prose-slate dark:prose-invert prose-sm max-w-none prose-img:mt-0"
+                        />
+                      )}
+
+                      {selectedPortfolio.stack?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Stack</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedPortfolio.stack.map((tech: string) => (
+                              <span key={tech} className="text-xs px-2.5 py-1 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white/70 rounded-md">
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedPortfolio.tags?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Tags</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedPortfolio.tags.map((tag: string) => (
+                              <span key={tag} className="text-xs px-2.5 py-1 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/40 rounded-full">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-3 pt-2">
+                        <Link href={`/projects/${selectedPortfolio.id}`}>
+                          <Button size="sm">View Full Project</Button>
+                        </Link>
+                        {selectedPortfolio.liveUrl && (
+                          <a href={selectedPortfolio.liveUrl} target="_blank" rel="noopener noreferrer">
+                            <Button variant="outline" size="sm">
+                              <ExternalLink size={13} className="mr-1.5" />Live Site
+                            </Button>
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
-
-              {selectedPortfolio.tags?.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-3">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPortfolio.tags.map((tag: string) => (
-                      <span key={tag} className="px-3 py-1 bg-slate-200 dark:bg-white/10 rounded text-sm">{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+              </>
+            )}
+          </RadixDialog.Content>
+        </RadixDialog.Portal>
+      </RadixDialog.Root>
     </div>
   )
 }

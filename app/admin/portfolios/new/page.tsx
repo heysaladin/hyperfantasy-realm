@@ -171,11 +171,10 @@ export default function NewPortfolioPage() {
             <Label htmlFor="copyright">Copyright</Label>
             <Input
               id="copyright"
-              type="url"
               value={formData.copyright}
               onChange={(e) => setFormData({...formData, copyright: e.target.value})}
               className="bg-white/5 border-white/10"
-              placeholder="https://github.com/..."
+              placeholder="© 2025 Studio Name"
             />
           </div>
         </div>

@@ -186,10 +186,10 @@ export default function EditPortfolioPage({
             <Label htmlFor="copyright">Copyright</Label>
             <Input
               id="copyright"
-              type="url"
               value={formData.copyright}
               onChange={(e) => setFormData({...formData, copyright: e.target.value})}
               className="bg-white/5 border-white/10"
+              placeholder="© 2025 Studio Name"
             />
           </div>
         </div>
