@@ -195,6 +195,7 @@ export default function ProjectsPage() {
   const sentinelInView = useRef(false)
   const filterPanelRef = useRef<HTMLDivElement>(null)
   const sortPanelRef = useRef<HTMLDivElement>(null)
+  const filterBarRef = useRef<HTMLDivElement>(null)
 
   // Fetch all visible portfolios once on mount
   useEffect(() => {
@@ -289,6 +290,38 @@ export default function ProjectsPage() {
     if (sentinelInView.current && hasMore) loadMore()
   }, [displayCount, filtered.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Hide navbar when filter bar touches it, reveal on scroll up
+  useEffect(() => {
+    const NAV_H = 64
+    let lastY = window.scrollY
+    let hidden = false
+
+    const onScroll = () => {
+      const y = window.scrollY
+      const goingDown = y > lastY
+
+      if (filterBarRef.current) {
+        const barTop = filterBarRef.current.getBoundingClientRect().top
+        // Filter bar is touching the navbar when its top <= NAV_H
+        if (goingDown && barTop <= NAV_H && !hidden) {
+          document.documentElement.style.setProperty('--nav-offset', `-${NAV_H}px`)
+          hidden = true
+        } else if (!goingDown && hidden) {
+          document.documentElement.style.setProperty('--nav-offset', '0px')
+          hidden = false
+        }
+      }
+
+      lastY = y
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      document.documentElement.style.setProperty('--nav-offset', '0px')
+    }
+  }, [])
+
   // Sentinel observer
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -341,7 +374,7 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors">
+    <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors pt-16">
 
       {/* Header */}
       <div className="border-b border-slate-200 dark:border-white/10">
@@ -352,7 +385,8 @@ export default function ProjectsPage() {
       </div>
 
       {/* Search + Sort & Filter */}
-      <div className="border-b border-slate-200 dark:border-white/10 sticky top-0 z-10 bg-white/95 dark:bg-black/95 backdrop-blur-sm">
+      <div ref={filterBarRef} className="border-b border-slate-200 dark:border-white/10 sticky z-10 bg-white/95 dark:bg-black/95 backdrop-blur-sm transition-[top] duration-300"
+        style={{ top: 'calc(var(--nav-offset, 0px) + 64px)' }}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
           <div className="flex items-center gap-3">
 

@@ -68,7 +68,7 @@ export default function AdminEnquiriesPage() {
   }
 
   return (
-    <div className="p-8 bg-white dark:bg-black text-slate-900 dark:text-white min-h-screen transition-colors">
+    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>

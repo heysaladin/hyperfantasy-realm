@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Instagram, Twitter, Linkedin, ArrowLeft } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { resolveContentAsText } from "@/lib/tiptap-content"
 
@@ -34,30 +33,10 @@ export default async function TeamPage() {
   const team = await getTeam()
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-slate-900 dark:text-white transition-colors">
-
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <Link href="/" className="text-2xl font-bold tracking-tight">
-              HYPERFANTASY
-            </Link>
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="/projects" className="text-sm hover:text-slate-600 dark:hover:text-white/60 transition">Works</Link>
-              <Link href="/about" className="text-sm hover:text-slate-600 dark:hover:text-white/60 transition">About</Link>
-              <Link href="/#services" className="text-sm hover:text-slate-600 dark:hover:text-white/60 transition">Services</Link>
-              <Button variant="outline" className="border-slate-300 dark:border-white/20 hover:bg-slate-100 dark:hover:bg-white/10" aria-label="Contact us">
-                Contact
-              </Button>
-              <ThemeToggle />
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-slate-900 dark:text-white transition-colors pt-16">
 
       {/* Header */}
-      <section className="pt-40 pb-20 px-6 lg:px-8 border-b border-slate-200 dark:border-white/5">
+      <section className="pt-16 pb-20 px-6 lg:px-8 border-b border-slate-200 dark:border-white/5">
         <div className="max-w-7xl mx-auto">
           <Link
             href="/about"
@@ -139,28 +118,6 @@ export default async function TeamPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-16 px-6 lg:px-8 border-t border-slate-200 dark:border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-            <div>
-              <div className="text-2xl font-bold mb-4">HYPERFANTASY</div>
-              <p className="text-slate-600 dark:text-white/40">Creative Studio © 2025</p>
-            </div>
-            <div className="flex gap-6">
-              <a href="#" className="text-slate-600 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition" aria-label="Follow us on Instagram">
-                <Instagram size={24} aria-hidden="true" />
-              </a>
-              <a href="#" className="text-slate-600 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition" aria-label="Follow us on Twitter">
-                <Twitter size={24} aria-hidden="true" />
-              </a>
-              <a href="#" className="text-slate-600 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition" aria-label="Follow us on LinkedIn">
-                <Linkedin size={24} aria-hidden="true" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
 
     </div>
   )

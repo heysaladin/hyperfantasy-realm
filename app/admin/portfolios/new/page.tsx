@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { TiptapEditor } from '@/components/tiptap-editor'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -15,7 +17,6 @@ export default function NewPortfolioPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    // longDescription: '',
     imageUrl: '',
     liveUrl: '',
     copyright: '',
@@ -93,7 +94,7 @@ export default function NewPortfolioPage() {
     }
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="max-w-4xl mx-auto px-6 lg:px-8 py-8">
       <Link 
         href="/admin/portfolios"
         className="inline-flex items-center text-white/60 hover:text-white transition mb-6"
@@ -107,7 +108,7 @@ export default function NewPortfolioPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* Title */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="title">Title *</Label>
           <Input
             id="title"
@@ -119,30 +120,17 @@ export default function NewPortfolioPage() {
         </div>
 
         {/* Description */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label>Description</Label>
           <TiptapEditor
             value={formData.description}
-            onChange={(json) => setFormData({ ...formData, description: json })}
+            onChange={(html) => setFormData({ ...formData, description: html })}
             placeholder="Brief description of the project…"
           />
         </div>
 
-        {/* Long Description 
-        <div>
-          <Label htmlFor="longDescription">Long Description</Label>
-          <Textarea
-            id="longDescription"
-            rows={6}
-            value={formData.longDescription}
-            onChange={(e) => setFormData({...formData, longDescription: e.target.value})}
-            className="bg-white/5 border-white/10"
-            placeholder="Detailed description for long projects"
-          />
-        </div> */}
-
         {/* Image URL */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="imageUrl">Image URL</Label>
           <Input
             id="imageUrl"
@@ -156,7 +144,7 @@ export default function NewPortfolioPage() {
 
         {/* Links Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="liveUrl">Live URL</Label>
             <Input
               id="liveUrl"
@@ -167,7 +155,7 @@ export default function NewPortfolioPage() {
               placeholder="https://example.com"
             />
           </div>
-          <div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="copyright">Copyright</Label>
             <Input
               id="copyright"
@@ -181,7 +169,7 @@ export default function NewPortfolioPage() {
 
         {/* Tags & Stack */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="tags">Tags</Label>
             <Input
               id="tags"
@@ -191,7 +179,7 @@ export default function NewPortfolioPage() {
               placeholder="Web, Mobile, E-commerce (comma separated)"
             />
           </div>
-          <div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="stack">Tech Stack</Label>
             <Input
               id="stack"
@@ -205,39 +193,44 @@ export default function NewPortfolioPage() {
 
         {/* Category & Complexity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="category">Category</Label>
-            <select
-              id="category"
+            <Select
               value={formData.category}
-              onChange={(e) => setFormData({...formData, category: e.target.value})}
-              className="w-full p-2 bg-white/5 border border-white/10 rounded-md"
+              onValueChange={(val) => setFormData({...formData, category: val})}
             >
-              <option value="">Select category</option>
-              <option value="ui-ux">UI/UX</option>
-              <option value="graphic-design">Graphic Design</option>
-              <option value="branding">Branding</option>
-              <option value="illustration">Illustration</option>
-              <option value="development">Development</option>
-            </select>
+              <SelectTrigger id="category">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ui-ux">UI/UX</SelectItem>
+                <SelectItem value="graphic-design">Graphic Design</SelectItem>
+                <SelectItem value="branding">Branding</SelectItem>
+                <SelectItem value="illustration">Illustration</SelectItem>
+                <SelectItem value="development">Development</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="complexity">Complexity</Label>
-            <select
-              id="complexity"
+            <Select
               value={formData.complexity}
-              onChange={(e) => setFormData({...formData, complexity: e.target.value})}
-              className="w-full p-2 bg-white/5 border border-white/10 rounded-md"
+              onValueChange={(val) => setFormData({...formData, complexity: val})}
             >
-              <option value="short">Short</option>
-              <option value="long">Long</option>
-            </select>
+              <SelectTrigger id="complexity">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="short">Short</SelectItem>
+                <SelectItem value="long">Long</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Project Date & Order */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="projectDate">Project Date</Label>
             <Input
               id="projectDate"
@@ -247,7 +240,7 @@ export default function NewPortfolioPage() {
               className="bg-white/5 border-white/10"
             />
           </div>
-          <div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="orderIndex">Order Index</Label>
             <Input
               id="orderIndex"
@@ -262,24 +255,22 @@ export default function NewPortfolioPage() {
 
         {/* Checkboxes */}
         <div className="flex gap-6">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="isVisible"
               checked={formData.isVisible}
-              onChange={(e) => setFormData({...formData, isVisible: e.target.checked})}
-              className="w-4 h-4"
+              onCheckedChange={(checked) => setFormData({...formData, isVisible: checked === true})}
             />
-            <span>Visible</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
+            <Label htmlFor="isVisible" className="cursor-pointer font-normal">Visible</Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="isFeatured"
               checked={formData.isFeatured}
-              onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
-              className="w-4 h-4"
+              onCheckedChange={(checked) => setFormData({...formData, isFeatured: checked === true})}
             />
-            <span>Featured</span>
-          </label>
+            <Label htmlFor="isFeatured" className="cursor-pointer font-normal">Featured</Label>
+          </div>
         </div>
 
         {/* Submit */}

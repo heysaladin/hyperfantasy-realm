@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 export default function NewEnquiryPage() {
@@ -65,21 +64,14 @@ export default function NewEnquiryPage() {
   }
 
   return (
-    <div className="p-8 max-w-4xl bg-white dark:bg-black text-slate-900 dark:text-white min-h-screen transition-colors">
-      <Link 
-        href="/"
-        className="inline-flex items-center text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition mb-6"
-      >
-        <ArrowLeft size={20} className="mr-2" />
-        Back to Home
-      </Link>
-
-      <h1 className="text-3xl font-bold mb-8">Add New Enquiry</h1>
+    <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors pt-16">
+<div className="max-w-3xl mx-auto px-6 lg:px-8 py-16">
+        <h1 className="text-4xl md:text-5xl font-bold mb-12">Get in Touch</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* Name */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="name">Name *</Label>
           <Input
             id="name"
@@ -92,7 +84,7 @@ export default function NewEnquiryPage() {
         </div>
 
         {/* Email */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="email">Email *</Label>
           <Input
             id="email"
@@ -106,7 +98,7 @@ export default function NewEnquiryPage() {
         </div>
 
         {/* Company */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="company">Company</Label>
           <Input
             id="company"
@@ -118,7 +110,7 @@ export default function NewEnquiryPage() {
         </div>
 
         {/* Budget */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="budget">Budget</Label>
           <Input
             id="budget"
@@ -130,7 +122,7 @@ export default function NewEnquiryPage() {
         </div>
 
         {/* Message */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="message">Message *</Label>
           <Textarea
             id="message"
@@ -155,6 +147,7 @@ export default function NewEnquiryPage() {
           </Link>
         </div>
       </form>
+      </div>
     </div>
   )
 }

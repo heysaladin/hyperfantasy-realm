@@ -22,7 +22,7 @@ export default function TeamsPage() {
   }
 
   return (
-    <div className="p-8 bg-white dark:bg-black text-slate-900 dark:text-white min-h-screen transition-colors">
+    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Team Members</h1>
         <Link href="/admin/teams/new">

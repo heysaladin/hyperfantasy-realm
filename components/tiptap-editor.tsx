@@ -40,8 +40,8 @@ function ToolbarButton({
       title={title}
       className={`p-1.5 rounded transition-colors ${
         active
-          ? 'bg-white/20 text-white'
-          : 'text-white/50 hover:text-white hover:bg-white/10'
+          ? 'bg-slate-200 dark:bg-white/20 text-slate-900 dark:text-white'
+          : 'text-slate-400 dark:text-white/50 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10'
       }`}
     >
       {children}
@@ -72,7 +72,7 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
     editorProps: {
       attributes: {
         class:
-          'min-h-[320px] px-4 py-3 text-sm text-white/90 leading-relaxed focus:outline-none prose prose-invert max-w-none',
+          'tiptap-content min-h-[320px] px-4 py-3 text-sm text-slate-900 dark:text-white/90 leading-relaxed focus:outline-none prose prose-slate dark:prose-invert max-w-none',
       },
     },
   })
@@ -95,9 +95,9 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
   }
 
   return (
-    <div className="rounded-md border border-white/10 bg-white/5 overflow-hidden">
+    <div className="rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 overflow-hidden">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-white/10 bg-white/5">
+      <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03]">
         {/* History */}
         <ToolbarButton title="Undo" onClick={() => editor.chain().focus().undo().run()}>
           <Undo size={15} />
@@ -106,7 +106,7 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
           <Redo size={15} />
         </ToolbarButton>
 
-        <div className="w-px h-4 bg-white/10 mx-1" />
+        <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1" />
 
         {/* Headings */}
         <ToolbarButton
@@ -131,7 +131,7 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
           <Heading3 size={15} />
         </ToolbarButton>
 
-        <div className="w-px h-4 bg-white/10 mx-1" />
+        <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1" />
 
         {/* Marks */}
         <ToolbarButton
@@ -170,7 +170,7 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
           <Code size={15} />
         </ToolbarButton>
 
-        <div className="w-px h-4 bg-white/10 mx-1" />
+        <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1" />
 
         {/* Lists */}
         <ToolbarButton
@@ -195,7 +195,7 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
           <Quote size={15} />
         </ToolbarButton>
 
-        <div className="w-px h-4 bg-white/10 mx-1" />
+        <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1" />
 
         {/* Alignment */}
         <ToolbarButton
@@ -220,7 +220,7 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
           <AlignRight size={15} />
         </ToolbarButton>
 
-        <div className="w-px h-4 bg-white/10 mx-1" />
+        <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1" />
 
         {/* Link */}
         <ToolbarButton

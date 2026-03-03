@@ -27,7 +27,7 @@ export default async function ArticleDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors">
+    <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors pt-16">
       <div className="border-b border-slate-200 dark:border-white/10">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 py-8">
           <Link href="/articles" className="inline-flex items-center text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition mb-8">

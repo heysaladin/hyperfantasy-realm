@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Pencil, Trash2, Search } from 'lucide-react'
 import Link from 'next/link'
+import { resolveContentAsText } from '@/lib/tiptap-content'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,13 +17,31 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
+function getPageNumbers(current: number, total: number): (number | '...')[] {
+  if (total <= 10) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages = new Set<number>()
+  for (let i = 1; i <= 5; i++) pages.add(i)
+  for (let i = total - 4; i <= total; i++) pages.add(i)
+  if (current > 5 && current < total - 4) {
+    pages.add(current - 1)
+    pages.add(current)
+    pages.add(current + 1)
+  }
+  const sorted = Array.from(pages).sort((a, b) => a - b)
+  const result: (number | '...')[] = []
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push('...')
+    result.push(sorted[i])
+  }
+  return result
+}
+
 export default function AdminPortfoliosPage() {
-  const [portfolios, setPortfolios] = useState([])
-  const [filteredPortfolios, setFilteredPortfolios] = useState([])
+  const [portfolios, setPortfolios] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  const itemsPerPage = 6
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchPortfolios()
@@ -31,41 +50,49 @@ export default function AdminPortfoliosPage() {
   const fetchPortfolios = async () => {
     const res = await fetch('/api/portfolios')
     const data = await res.json()
-    setPortfolios(data)
-    setFilteredPortfolios(data)
+    setPortfolios(Array.isArray(data) ? data : [])
   }
 
-  // Search filter
-  useEffect(() => {
-    const filtered = portfolios.filter((p: any) => 
-      p.title?.toLowerCase().includes(search.toLowerCase()) ||
-      p.description?.toLowerCase().includes(search.toLowerCase())
+  // Derived: filter and paginate
+  const filtered = portfolios.filter((p: any) => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return (
+      p.title?.toLowerCase().includes(q) ||
+      resolveContentAsText(p.description).toLowerCase().includes(q)
     )
-    setFilteredPortfolios(filtered)
-    setCurrentPage(1)
-  }, [search, portfolios])
+  })
 
-  // Pagination
-  const totalPages = Math.ceil(filteredPortfolios.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedData = filteredPortfolios.slice(startIndex, startIndex + itemsPerPage)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage))
+  const safePage = Math.min(currentPage, totalPages)
+  const startIndex = (safePage - 1) * itemsPerPage
+  const paginatedData = filtered.slice(startIndex, startIndex + itemsPerPage)
+
+  const handleSearch = (value: string) => {
+    setSearch(value)
+    setCurrentPage(1)
+  }
 
   const handleDelete = async () => {
     if (!deleteId) return
-    
     await fetch(`/api/portfolios/${deleteId}`, { method: 'DELETE' })
     await fetchPortfolios()
     setDeleteId(null)
+    // Clamp page after deletion
+    const newTotal = Math.max(1, Math.ceil((filtered.length - 1) / itemsPerPage))
+    if (currentPage > newTotal) setCurrentPage(newTotal)
   }
 
   return (
-    <div className="p-8 bg-white dark:bg-black text-slate-900 dark:text-white min-h-screen transition-colors">
+    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Portfolios</h1>
           <p className="text-slate-600 dark:text-white/60 text-sm mt-1">
-            Total: {filteredPortfolios.length} portfolios
+            {search
+              ? `${filtered.length} of ${portfolios.length} portfolios`
+              : `Total: ${portfolios.length} portfolios`}
           </p>
         </div>
         <Link href="/admin/portfolios/new">
@@ -82,7 +109,7 @@ export default function AdminPortfoliosPage() {
         <Input
           placeholder="Search by title or description..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           className="pl-10 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10"
         />
       </div>
@@ -106,7 +133,7 @@ export default function AdminPortfoliosPage() {
                   <div>
                     <div className="font-medium">{portfolio.title}</div>
                     <div className="text-sm text-slate-600 dark:text-white/60 line-clamp-1">
-                      {portfolio.description}
+                      {resolveContentAsText(portfolio.description)}
                     </div>
                   </div>
                 </td>
@@ -122,8 +149,8 @@ export default function AdminPortfoliosPage() {
                 </td>
                 <td className="p-4">
                   <span className={`px-2 py-1 text-xs rounded ${
-                    portfolio.isVisible 
-                      ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' 
+                    portfolio.isVisible
+                      ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
                       : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'
                   }`}>
                     {portfolio.isVisible ? 'Visible' : 'Hidden'}
@@ -136,8 +163,8 @@ export default function AdminPortfoliosPage() {
                         <Pencil size={16} />
                       </Button>
                     </Link>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => setDeleteId(portfolio.id)}
                     >
@@ -151,8 +178,8 @@ export default function AdminPortfoliosPage() {
         </table>
 
         {paginatedData.length === 0 && (
-          <div className="p-8 text-center text-white/40">
-            No portfolios found
+          <div className="p-8 text-center text-slate-500 dark:text-white/40">
+            {search ? 'No portfolios match your search' : 'No portfolios found'}
           </div>
         )}
       </div>
@@ -164,37 +191,43 @@ export default function AdminPortfoliosPage() {
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
+            disabled={safePage === 1}
           >
             Previous
           </Button>
-          
+
           <div className="flex gap-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <Button
-                key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
-                onClick={() => setCurrentPage(page)}
-                className="min-w-10"
-              >
-                {page}
-              </Button>
-            ))}
+            {getPageNumbers(safePage, totalPages).map((page, i) =>
+              page === '...' ? (
+                <span key={`ellipsis-${i}`} className="flex items-center px-2 text-slate-400 dark:text-white/40">
+                  …
+                </span>
+              ) : (
+                <Button
+                  key={page}
+                  variant={safePage === page ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className="min-w-10"
+                >
+                  {page}
+                </Button>
+              )
+            )}
           </div>
-          
+
           <Button
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
+            disabled={safePage === totalPages}
           >
             Next
           </Button>
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

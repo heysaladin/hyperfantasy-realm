@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { TiptapEditor } from '@/components/tiptap-editor'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -102,7 +103,7 @@ export default function EditBlogPage({
   }
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="max-w-4xl mx-auto px-6 lg:px-8 py-8">
       <Link 
         href="/admin/blogs"
         className="inline-flex items-center text-white/60 hover:text-white transition mb-6"
@@ -116,7 +117,7 @@ export default function EditBlogPage({
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* Title */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="title">Title *</Label>
           <Input
             id="title"
@@ -128,7 +129,7 @@ export default function EditBlogPage({
         </div>
 
         {/* Slug */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="slug">Slug *</Label>
           <Input
             id="slug"
@@ -141,7 +142,7 @@ export default function EditBlogPage({
         </div>
 
         {/* Excerpt */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="excerpt">Excerpt</Label>
           <Input
             id="excerpt"
@@ -153,7 +154,7 @@ export default function EditBlogPage({
         </div>
 
         {/* Content */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label>Content</Label>
           <TiptapEditor
             value={formData.content}
@@ -163,7 +164,7 @@ export default function EditBlogPage({
         </div>
 
         {/* Cover Image URL */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="coverImage">Cover Image URL</Label>
           <Input
             id="coverImage"
@@ -176,7 +177,7 @@ export default function EditBlogPage({
         </div>
 
         {/* Tags */}
-        <div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="tags">Tags</Label>
           <Input
             id="tags"
@@ -189,15 +190,14 @@ export default function EditBlogPage({
 
         {/* Checkboxes */}
         <div className="flex gap-6">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="isPublished"
               checked={formData.isPublished}
-              onChange={(e) => setFormData({...formData, isPublished: e.target.checked})}
-              className="w-4 h-4"
+              onCheckedChange={(checked) => setFormData({...formData, isPublished: checked === true})}
             />
-            <span>Published</span>
-          </label>
+            <Label htmlFor="isPublished" className="cursor-pointer font-normal">Published</Label>
+          </div>
         </div>
 
         {/* Submit */}

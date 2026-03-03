@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { ArrowRight, Mail, Instagram, Linkedin, Twitter, Link, Star } from "lucide-react"
+import { ArrowRight, Mail, Instagram, Linkedin, Twitter, Star } from "lucide-react"
+
 import { testimonials } from "@/data/testimonials"
 import { resolveContentAsText } from "@/lib/tiptap-content"
 
@@ -41,29 +41,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-slate-900 dark:text-white transition-colors">
       
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="text-2xl font-bold tracking-tight">
-              HYPERFANTASY
-            </div>
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#work" className="text-sm hover:text-slate-600 dark:hover:text-white/60 transition" aria-label="View our works and projects">Works</a>
-              <a href="/about" className="text-sm hover:text-slate-600 dark:hover:text-white/60 transition" aria-label="Learn about our studio">About</a>
-              <a href="#services" className="text-sm hover:text-slate-600 dark:hover:text-white/60 transition" aria-label="View our services">Services</a>
-              <Button variant="outline" className="border-slate-300 dark:border-white/20 hover:bg-slate-100 dark:hover:bg-white/10" aria-label="Contact us for inquiries">
-                Contact
-              </Button>
-              <Link href="/projects" className="text-sm hover:text-slate-600 dark:hover:text-white/60 transition" aria-label="View our portfolio">
-                Work
-              </Link>
-              <ThemeToggle />
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -212,50 +189,60 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-32 px-6 lg:px-8 bg-slate-50 dark:bg-white/5">
-        <div className="max-w-7xl mx-auto">
+      <section id="testimonials" className="py-32 bg-slate-50 dark:bg-white/5 overflow-hidden">
+        <style>{`
+          @keyframes marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+          }
+        `}</style>
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <h2 className="text-sm uppercase tracking-widest text-slate-500 dark:text-white/40 mb-4">Testimonials</h2>
           <h3 className="text-5xl md:text-6xl font-bold mb-16 text-slate-900 dark:text-white">
             What our clients say
           </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial) => (
-              <div 
-                key={testimonial.id} 
-                className="bg-white dark:bg-white/10 rounded-lg p-8 border border-slate-200 dark:border-white/10 hover:shadow-lg dark:hover:shadow-lg/20 transition-shadow"
+        </div>
+
+        {/* Marquee track */}
+        <div className="relative">
+          {/* Fade edges */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-32 z-10 bg-gradient-to-r from-slate-50 dark:from-[#0d0d0d] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-32 z-10 bg-gradient-to-l from-slate-50 dark:from-[#0d0d0d] to-transparent" />
+
+          <div
+            style={{ animation: 'marquee 35s linear infinite', display: 'flex', gap: '24px', width: 'max-content' }}
+            onMouseEnter={e => (e.currentTarget.style.animationPlayState = 'paused')}
+            onMouseLeave={e => (e.currentTarget.style.animationPlayState = 'running')}
+          >
+            {[...testimonials, ...testimonials].map((testimonial, i) => (
+              <div
+                key={i}
+                className="w-80 shrink-0 bg-white dark:bg-white/10 rounded-lg p-6 border border-slate-200 dark:border-white/10"
               >
-                <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-3 mb-4">
                   {testimonial.image && (
-                    <img 
-                      src={testimonial.image} 
+                    <img
+                      src={testimonial.image}
                       alt={testimonial.name}
-                      className="w-14 h-14 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover shrink-0"
                     />
                   )}
                   <div>
-                    <h4 className="font-semibold text-slate-900 dark:text-white">{testimonial.name}</h4>
-                    <p className="text-sm text-slate-600 dark:text-white/60">{testimonial.role}</p>
+                    <h4 className="font-semibold text-slate-900 dark:text-white text-sm">{testimonial.name}</h4>
+                    <p className="text-xs text-slate-600 dark:text-white/60">{testimonial.role}</p>
                     <p className="text-xs text-slate-500 dark:text-white/40">{testimonial.company}</p>
                   </div>
                 </div>
-                
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" aria-hidden="true" />
+
+                <div className="flex gap-0.5 mb-3">
+                  {Array.from({ length: testimonial.rating }).map((_, j) => (
+                    <Star key={j} size={13} className="fill-yellow-400 text-yellow-400" aria-hidden="true" />
                   ))}
                 </div>
-                
-                <p className="text-slate-600 dark:text-white/70 leading-relaxed">
+
+                <p className="text-sm text-slate-600 dark:text-white/70 leading-relaxed line-clamp-4">
                   "{testimonial.content}"
-                </p>
-                
-                <p className="text-xs text-slate-500 dark:text-white/40 mt-4">
-                  {new Date(testimonial.date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
                 </p>
               </div>
             ))}
@@ -282,29 +269,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-16 px-6 lg:px-8 border-t border-slate-200 dark:border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-            <div>
-              <div className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">HYPERFANTASY</div>
-              <p className="text-slate-600 dark:text-white/40">Creative Studio © 2025</p>
-            </div>
-            
-            <div className="flex gap-6">
-              <a href="#" className="text-slate-600 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition" aria-label="Follow us on Instagram">
-                <Instagram size={24} aria-hidden="true" />
-              </a>
-              <a href="#" className="text-slate-600 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition" aria-label="Follow us on Twitter">
-                <Twitter size={24} aria-hidden="true" />
-              </a>
-              <a href="#" className="text-slate-600 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition" aria-label="Follow us on LinkedIn">
-                <Linkedin size={24} aria-hidden="true" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
 
     </div>
   );

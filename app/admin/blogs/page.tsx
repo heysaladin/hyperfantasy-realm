@@ -16,13 +16,31 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
+function getPageNumbers(current: number, total: number): (number | '...')[] {
+  if (total <= 10) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages = new Set<number>()
+  for (let i = 1; i <= 5; i++) pages.add(i)
+  for (let i = total - 4; i <= total; i++) pages.add(i)
+  if (current > 5 && current < total - 4) {
+    pages.add(current - 1)
+    pages.add(current)
+    pages.add(current + 1)
+  }
+  const sorted = Array.from(pages).sort((a, b) => a - b)
+  const result: (number | '...')[] = []
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push('...')
+    result.push(sorted[i])
+  }
+  return result
+}
+
 export default function AdminBlogsPage() {
-  const [blogs, setBlogs] = useState([])
-  const [filteredBlogs, setFilteredBlogs] = useState([])
+  const [blogs, setBlogs] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  const itemsPerPage = 6
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchBlogs()
@@ -31,41 +49,48 @@ export default function AdminBlogsPage() {
   const fetchBlogs = async () => {
     const res = await fetch('/api/blogs')
     const data = await res.json()
-    setBlogs(data)
-    setFilteredBlogs(data)
+    setBlogs(Array.isArray(data) ? data : [])
   }
 
-  // Search filter
-  useEffect(() => {
-    const filtered = blogs.filter((p: any) => 
-      p.title?.toLowerCase().includes(search.toLowerCase()) ||
-      p.excerpt?.toLowerCase().includes(search.toLowerCase())
+  // Derived: filter and paginate
+  const filtered = blogs.filter((b: any) => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return (
+      b.title?.toLowerCase().includes(q) ||
+      b.excerpt?.toLowerCase().includes(q)
     )
-    setFilteredBlogs(filtered)
-    setCurrentPage(1)
-  }, [search, blogs])
+  })
 
-  // Pagination
-  const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedData = filteredBlogs.slice(startIndex, startIndex + itemsPerPage)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage))
+  const safePage = Math.min(currentPage, totalPages)
+  const startIndex = (safePage - 1) * itemsPerPage
+  const paginatedData = filtered.slice(startIndex, startIndex + itemsPerPage)
+
+  const handleSearch = (value: string) => {
+    setSearch(value)
+    setCurrentPage(1)
+  }
 
   const handleDelete = async () => {
     if (!deleteId) return
-    
     await fetch(`/api/blogs/${deleteId}`, { method: 'DELETE' })
     await fetchBlogs()
     setDeleteId(null)
+    const newTotal = Math.max(1, Math.ceil((filtered.length - 1) / itemsPerPage))
+    if (currentPage > newTotal) setCurrentPage(newTotal)
   }
 
   return (
-    <div className="p-8 bg-white dark:bg-black text-slate-900 dark:text-white min-h-screen transition-colors\">
+    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Blogs</h1>
           <p className="text-slate-600 dark:text-white/60 text-sm mt-1">
-            Total: {filteredBlogs.length} blogs
+            {search
+              ? `${filtered.length} of ${blogs.length} blogs`
+              : `Total: ${blogs.length} blogs`}
           </p>
         </div>
         <Link href="/admin/blogs/new">
@@ -78,11 +103,11 @@ export default function AdminBlogsPage() {
 
       {/* Search */}
       <div className="mb-6 relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40\" size={20} />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40" size={20} />
         <Input
-          placeholder="Search by title or description..."
+          placeholder="Search by title or excerpt..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           className="pl-10 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10"
         />
       </div>
@@ -90,33 +115,35 @@ export default function AdminBlogsPage() {
       {/* Table */}
       <div className="border border-slate-300 dark:border-white/10 rounded-lg overflow-hidden mb-6">
         <table className="w-full">
-          <thead className="bg-slate-100 dark:bg-white/5 border-b border-slate-300 dark:border-white/10\">
+          <thead className="bg-slate-100 dark:bg-white/5 border-b border-slate-300 dark:border-white/10">
             <tr>
               <th className="text-left p-4 font-semibold">Title</th>
               <th className="text-left p-4 font-semibold">Slug</th>
               <th className="text-left p-4 font-semibold">Tags</th>
-              <th className="text-left p-4 font-semibold">Publish</th>
+              <th className="text-left p-4 font-semibold">Status</th>
               <th className="text-right p-4 font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody>
             {paginatedData.map((blog: any) => (
-              <tr key={blog.id} className="border-b border-white/5 hover:bg-white/5">
+              <tr key={blog.id} className="border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5">
                 <td className="p-4">
                   <div>
                     <div className="font-medium">{blog.title}</div>
-                    <div className="text-sm text-white/60 line-clamp-1">
+                    <div className="text-sm text-slate-600 dark:text-white/60 line-clamp-1">
                       {blog.excerpt}
                     </div>
                   </div>
                 </td>
-                <td className="p-4 text-white/60 capitalize">{blog.slug || '-'}</td>
-                <td className="p-4 text-white/60 capitalize">{blog.tags || '-'}</td>
+                <td className="p-4 text-slate-600 dark:text-white/60">{blog.slug || '-'}</td>
+                <td className="p-4 text-slate-600 dark:text-white/60">
+                  {Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags || '-'}
+                </td>
                 <td className="p-4">
                   <span className={`px-2 py-1 text-xs rounded ${
-                    blog.isPublished 
-                      ? 'bg-green-500/20 text-green-400' 
-                      : 'bg-red-500/20 text-red-400'
+                    blog.isPublished
+                      ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
+                      : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'
                   }`}>
                     {blog.isPublished ? 'Published' : 'Draft'}
                   </span>
@@ -128,8 +155,8 @@ export default function AdminBlogsPage() {
                         <Pencil size={16} />
                       </Button>
                     </Link>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => setDeleteId(blog.id)}
                     >
@@ -143,8 +170,8 @@ export default function AdminBlogsPage() {
         </table>
 
         {paginatedData.length === 0 && (
-          <div className="p-8 text-center text-white/40">
-            No blogs found
+          <div className="p-8 text-center text-slate-500 dark:text-white/40">
+            {search ? 'No blogs match your search' : 'No blogs found'}
           </div>
         )}
       </div>
@@ -156,37 +183,43 @@ export default function AdminBlogsPage() {
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
+            disabled={safePage === 1}
           >
             Previous
           </Button>
-          
+
           <div className="flex gap-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <Button
-                key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
-                onClick={() => setCurrentPage(page)}
-                className="min-w-10"
-              >
-                {page}
-              </Button>
-            ))}
+            {getPageNumbers(safePage, totalPages).map((page, i) =>
+              page === '...' ? (
+                <span key={`ellipsis-${i}`} className="flex items-center px-2 text-slate-400 dark:text-white/40">
+                  …
+                </span>
+              ) : (
+                <Button
+                  key={page}
+                  variant={safePage === page ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className="min-w-10"
+                >
+                  {page}
+                </Button>
+              )
+            )}
           </div>
-          
+
           <Button
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
+            disabled={safePage === totalPages}
           >
             Next
           </Button>
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
