@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Dialog as RadixDialog } from 'radix-ui'
 import { ArrowDownAZ, ArrowDownWideNarrow, ArrowUpNarrowWide, ChevronDown, ExternalLink, Image, LayoutGrid, Search, SlidersHorizontal, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -171,6 +172,8 @@ function RangeSlider({ min, max, value, onChange }: {
 // ---------- main page ----------
 
 export default function ProjectsPage() {
+  const router = useRouter()
+
   // All portfolios fetched once
   const [allPortfolios, setAllPortfolios] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -195,7 +198,7 @@ export default function ProjectsPage() {
 
   // Fetch all visible portfolios once on mount
   useEffect(() => {
-    fetch('/api/portfolios?limit=500&offset=0&visible=true')
+    fetch('/api/portfolios?limit=500&offset=0')
       .then(r => r.json())
       .then(data => {
         const items: any[] = data.items || []
@@ -257,9 +260,11 @@ export default function ProjectsPage() {
         break
       default:
         result.sort((a, b) => {
-          const orderDiff = (b.orderIndex ?? 0) - (a.orderIndex ?? 0)  // desc
+          const orderDiff = (b.orderIndex ?? 0) - (a.orderIndex ?? 0)
           if (orderDiff !== 0) return orderDiff
-          return new Date(b.projectDate ?? 0).getTime() - new Date(a.projectDate ?? 0).getTime()  // desc
+          const dateDiff = new Date(b.projectDate ?? 0).getTime() - new Date(a.projectDate ?? 0).getTime()
+          if (dateDiff !== 0) return dateDiff
+          return (b.isVisible ? 1 : 0) - (a.isVisible ? 1 : 0)
         })
     }
 
@@ -328,7 +333,11 @@ export default function ProjectsPage() {
   ].filter(Boolean).length
 
   const handleClick = (portfolio: any) => {
-    setSelectedPortfolio(portfolio)
+    if (portfolio.complexity === 'long') {
+      router.push(`/projects/${portfolio.id}`)
+    } else {
+      setSelectedPortfolio(portfolio)
+    }
   }
 
   return (

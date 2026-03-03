@@ -9,6 +9,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'randomuser.me' },
       { protocol: 'https', hostname: 'miro.medium.com' },
       { protocol: 'https', hostname: 'cdn.dribbble.com' },
+      { protocol: 'https', hostname: 'farooq-agent.web.app' },
     ],
   },
 }
