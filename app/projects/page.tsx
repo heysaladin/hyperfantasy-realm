@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Dialog as RadixDialog } from 'radix-ui'
-import { ArrowDownAZ, ArrowDownWideNarrow, ArrowUpNarrowWide, ExternalLink, Image, LayoutGrid, Search, X } from 'lucide-react'
+import { ArrowDownAZ, ArrowDownWideNarrow, ArrowUpNarrowWide, ChevronDown, ExternalLink, Image, LayoutGrid, Search, SlidersHorizontal, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { resolveContent, resolveContentAsText } from '@/lib/tiptap-content'
 import { ArticleContent } from '@/components/article-content'
@@ -181,6 +181,8 @@ export default function ProjectsPage() {
   const [complexity, setComplexity] = useState('')
   const [showMeta, setShowMeta] = useState(true)
   const [yearRange, setYearRange] = useState<[number, number] | null>(null)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [isSortOpen, setIsSortOpen] = useState(false)
 
   // How many filtered results to display (infinite scroll)
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE)
@@ -188,6 +190,8 @@ export default function ProjectsPage() {
   const [selectedPortfolio, setSelectedPortfolio] = useState<any>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const sentinelInView = useRef(false)
+  const filterPanelRef = useRef<HTMLDivElement>(null)
+  const sortPanelRef = useRef<HTMLDivElement>(null)
 
   // Fetch all visible portfolios once on mount
   useEffect(() => {
@@ -295,6 +299,34 @@ export default function ProjectsPage() {
     return () => obs.disconnect()
   }, [hasMore]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Close panels on outside click
+  useEffect(() => {
+    if (!isFilterOpen && !isSortOpen) return
+    const handler = (e: MouseEvent) => {
+      if (filterPanelRef.current && !filterPanelRef.current.contains(e.target as Node)) {
+        setIsFilterOpen(false)
+      }
+      if (sortPanelRef.current && !sortPanelRef.current.contains(e.target as Node)) {
+        setIsSortOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [isFilterOpen, isSortOpen])
+
+  const resetAll = () => {
+    setCategory('')
+    setComplexity('')
+    if (dataYears) setYearRange([dataYears.min, dataYears.max])
+  }
+
+  const activeSortCount = sort !== 'order' ? 1 : 0
+  const activeFilterCount = [
+    category !== '',
+    complexity !== '',
+    dataYears && yearRange && (yearRange[0] > dataYears.min || yearRange[1] < dataYears.max),
+  ].filter(Boolean).length
+
   const handleClick = (portfolio: any) => {
     setSelectedPortfolio(portfolio)
   }
@@ -310,122 +342,180 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Search + Sort */}
+      {/* Search + Sort & Filter */}
       <div className="border-b border-slate-200 dark:border-white/10 sticky top-0 z-10 bg-white/95 dark:bg-black/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
+          <div className="flex items-center gap-3">
 
-          <div className="flex items-center justify-between gap-3">
-            {/* Search + meta toggle — left */}
-            <div className="flex items-center gap-2 w-full max-w-sm">
-            <div className="relative flex-1">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/30" />
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search projects…"
-                className="w-full pl-9 pr-8 py-2 text-sm bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg outline-none focus:border-slate-400 dark:focus:border-white/30 transition placeholder:text-slate-400 dark:placeholder:text-white/30"
-              />
-              {search && (
-                <button onClick={() => setSearch('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-white/30 dark:hover:text-white/60 transition">
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-            <button
-              title={showMeta ? 'Image only' : 'Show details'}
-              onClick={() => setShowMeta(v => !v)}
-              className={`p-2 rounded-lg transition flex-shrink-0 ${
-                !showMeta
-                  ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
-                  : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10'
-              }`}
-            >
-              <Image size={15} />
-            </button>
-            </div>
-
-            {/* Complexity pills — centre */}
-            <div className="flex items-center gap-1">
-              {COMPLEXITIES.map(c => (
-                <button
-                  key={c.value}
-                  onClick={() => setComplexity(c.value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    complexity === c.value
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
-                      : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10'
-                  }`}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Sort icons — right */}
-            <div className="flex items-center gap-1">
-              {SORT_OPTIONS.map(({ value, label, icon: Icon }) => (
-                <button
-                  key={value}
-                  title={label}
-                  onClick={() => setSort(value)}
-                  className={`p-2 rounded-lg transition ${
-                    sort === value
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
-                      : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10'
-                  }`}
-                >
-                  <Icon size={15} />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Category pills */}
-          <div className="mt-3 flex items-center gap-1">
-            {CATEGORIES.map(cat => (
+            {/* Left: Search + meta toggle */}
+            <div className="flex items-center gap-2 flex-1">
+              <div className="relative w-full max-w-sm">
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/30" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search projects…"
+                  className="w-full pl-9 pr-8 py-2 text-sm bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg outline-none focus:border-slate-400 dark:focus:border-white/30 transition placeholder:text-slate-400 dark:placeholder:text-white/30"
+                />
+                {search && (
+                  <button onClick={() => setSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-white/30 dark:hover:text-white/60 transition">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
               <button
-                key={cat.value}
-                onClick={() => setCategory(cat.value)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  category === cat.value
+                title={showMeta ? 'Image only' : 'Show details'}
+                onClick={() => setShowMeta(v => !v)}
+                className={`p-2 rounded-lg transition flex-shrink-0 ${
+                  !showMeta
                     ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10'
                 }`}
               >
-                {cat.label}
+                <Image size={15} />
               </button>
-            ))}
-          </div>
+            </div>
 
-          {/* Date range slider */}
-          {dataYears && yearRange && (
-            <div className="mt-3 flex items-center gap-3">
-              <span className="text-xs tabular-nums text-slate-500 dark:text-white/40 w-10 text-right shrink-0">
-                {yearRange[1]}
-              </span>
-              <div className="flex-1">
-                <RangeSlider
-                  min={dataYears.min}
-                  max={dataYears.max}
-                  value={yearRange}
-                  onChange={setYearRange}
-                />
-              </div>
-              <span className="text-xs tabular-nums text-slate-500 dark:text-white/40 w-10 shrink-0">
-                {yearRange[0]}
-              </span>
-              {(yearRange[0] > dataYears.min || yearRange[1] < dataYears.max) && (
-                <button
-                  onClick={() => setYearRange([dataYears.min, dataYears.max])}
-                  className="text-xs text-slate-400 hover:text-slate-700 dark:text-white/30 dark:hover:text-white/70 transition shrink-0"
-                >
-                  Reset
-                </button>
+            {/* Right: Sort dropdown */}
+            <div className="relative flex-shrink-0" ref={sortPanelRef}>
+              <button
+                onClick={() => { setIsSortOpen(v => !v); setIsFilterOpen(false) }}
+                className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition ${
+                  isSortOpen || activeSortCount > 0
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-black border-slate-900 dark:border-white'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10'
+                }`}
+              >
+                <span>Sort</span>
+                {activeSortCount > 0 && (
+                  <span className="flex items-center justify-center w-4 h-4 text-[10px] font-bold rounded-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                    {activeSortCount}
+                  </span>
+                )}
+                <ChevronDown size={13} className={`transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isSortOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden z-20">
+                  <div className="p-3 space-y-1">
+                    {SORT_OPTIONS.map(({ value, label, icon: Icon }) => (
+                      <button
+                        key={value}
+                        onClick={() => { setSort(value); setIsSortOpen(false) }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition ${
+                          sort === value
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
+                            : 'text-slate-600 dark:text-white/60 hover:bg-slate-100 dark:hover:bg-white/5'
+                        }`}
+                      >
+                        <Icon size={13} />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
-          )}
+
+            {/* Filter dropdown */}
+            <div className="relative flex-shrink-0" ref={filterPanelRef}>
+              <button
+                onClick={() => { setIsFilterOpen(v => !v); setIsSortOpen(false) }}
+                className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition ${
+                  isFilterOpen || activeFilterCount > 0
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-black border-slate-900 dark:border-white'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10'
+                }`}
+              >
+                <SlidersHorizontal size={14} />
+                <span>Filter</span>
+                {activeFilterCount > 0 && (
+                  <span className="flex items-center justify-center w-4 h-4 text-[10px] font-bold rounded-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                    {activeFilterCount}
+                  </span>
+                )}
+                <ChevronDown size={13} className={`transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isFilterOpen && (
+                <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden z-20">
+
+                  {/* Category section */}
+                  <div className="p-4 border-b border-slate-100 dark:border-white/10">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">Category</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {CATEGORIES.map(cat => (
+                        <button
+                          key={cat.value}
+                          onClick={() => setCategory(cat.value)}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                            category === cat.value
+                              ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
+                              : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10'
+                          }`}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Complexity section */}
+                  <div className="p-4 border-b border-slate-100 dark:border-white/10">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">Complexity</p>
+                    <div className="flex gap-1.5">
+                      {COMPLEXITIES.map(c => (
+                        <button
+                          key={c.value}
+                          onClick={() => setComplexity(c.value)}
+                          className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                            complexity === c.value
+                              ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
+                              : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10'
+                          }`}
+                        >
+                          {c.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Date range section */}
+                  {dataYears && yearRange && (
+                    <div className="p-4 border-b border-slate-100 dark:border-white/10">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">Date Range</p>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs tabular-nums text-slate-500 dark:text-white/40 w-10 text-right shrink-0">{yearRange[1]}</span>
+                        <div className="flex-1">
+                          <RangeSlider min={dataYears.min} max={dataYears.max} value={yearRange} onChange={setYearRange} />
+                        </div>
+                        <span className="text-xs tabular-nums text-slate-500 dark:text-white/40 w-10 shrink-0">{yearRange[0]}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Footer: Reset All + Apply */}
+                  <div className="p-4 flex gap-2">
+                    <button
+                      onClick={resetAll}
+                      className="flex-1 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/60 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+                    >
+                      Reset All
+                    </button>
+                    <button
+                      onClick={() => setIsFilterOpen(false)}
+                      className="flex-1 py-2 text-sm rounded-lg bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-slate-700 dark:hover:bg-white/90 transition"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
         </div>
       </div>
 
