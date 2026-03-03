@@ -55,7 +55,7 @@ function PortfolioCard({ portfolio, index, onClick, showMeta }: { portfolio: any
   // Stagger only for the first page (initial load); scroll-in cards animate instantly
   const delay = index < PAGE_SIZE ? index * 50 : 0
   return (
-    <div ref={ref} onClick={onClick} className="group block cursor-pointer"
+    <div ref={ref} onClick={onClick} className="group block cursor-pointer break-inside-avoid mb-8"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(16px)',
@@ -65,9 +65,9 @@ function PortfolioCard({ portfolio, index, onClick, showMeta }: { portfolio: any
     >
       <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 transition hover:border-slate-300 dark:hover:border-white/20">
         {portfolio.imageUrl && (
-          <div className="aspect-[16/10] overflow-hidden bg-slate-200 dark:bg-white/5">
+          <div className="overflow-hidden bg-slate-200 dark:bg-white/5">
             <img src={portfolio.imageUrl} alt={portfolio.title} loading="lazy" decoding="async"
-              className="object-cover w-full h-full transition group-hover:scale-105" />
+              className="w-full h-auto block transition group-hover:scale-105" />
           </div>
         )}
         {showMeta && (
@@ -95,7 +95,7 @@ function PortfolioCard({ portfolio, index, onClick, showMeta }: { portfolio: any
 
 function SkeletonCard({ showMeta }: { showMeta: boolean }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+    <div className="break-inside-avoid mb-8 overflow-hidden rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
       <div className="aspect-[16/10] bg-slate-200 dark:bg-white/10 animate-pulse" />
       {showMeta && (
         <div className="p-6 space-y-4">
@@ -521,7 +521,7 @@ export default function ProjectsPage() {
 
       {/* Grid */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-8">
           {isLoading
             ? Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} showMeta={showMeta} />)
             : displayed.map((portfolio, index) => (
