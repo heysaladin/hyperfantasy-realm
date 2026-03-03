@@ -626,16 +626,23 @@ export default function ProjectsPage() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-3 pt-2">
-                        <Link href={`/projects/${selectedPortfolio.id}`}>
-                          <Button size="sm">View Full Project</Button>
-                        </Link>
-                        {selectedPortfolio.liveUrl && (
-                          <a href={selectedPortfolio.liveUrl} target="_blank" rel="noopener noreferrer">
-                            <Button variant="outline" size="sm">
-                              <ExternalLink size={13} className="mr-1.5" />Live Site
-                            </Button>
-                          </a>
+                      <div className="flex items-center justify-between gap-3 pt-2">
+                        <div className="flex items-center gap-3">
+                          <Link href={`/projects/${selectedPortfolio.id}`}>
+                            <Button size="sm">View Full Project</Button>
+                          </Link>
+                          {selectedPortfolio.liveUrl && (
+                            <a href={selectedPortfolio.liveUrl} target="_blank" rel="noopener noreferrer">
+                              <Button variant="outline" size="sm">
+                                <ExternalLink size={13} className="mr-1.5" />Live Site
+                              </Button>
+                            </a>
+                          )}
+                        </div>
+                        {selectedPortfolio.projectDate && (
+                          <span className="text-xs text-slate-400 dark:text-white/30 tabular-nums shrink-0">
+                            {new Date(selectedPortfolio.projectDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                          </span>
                         )}
                       </div>
                     </div>

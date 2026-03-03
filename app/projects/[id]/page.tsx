@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Github } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { ClientDate } from '@/components/client-date'
 import { resolveContent } from '@/lib/tiptap-content'
 import { ArticleContent } from '@/components/article-content'
 
@@ -12,7 +11,7 @@ async function getPortfolio(id: string) {
   })
   if (!res.ok) return null
   const portfolios = await res.json()
-  return portfolios.find((p: any) => p.id === id && p.isVisible)
+  return portfolios.find((p: any) => p.id === id)
 }
 
 export default async function PortfolioDetailPage({
@@ -29,85 +28,73 @@ export default async function PortfolioDetailPage({
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors">
-      {/* Header */}
       <div className="border-b border-slate-200 dark:border-white/10">
-        <div className="max-w-5xl mx-auto px-6 lg:px-8 py-8">
-          <Link href="/projects" className="inline-flex items-center text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition mb-8">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8 py-8">
+          <Link href="/projects" className="inline-flex items-center text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition">
             <ArrowLeft size={20} className="mr-2" />
             Back to Works
           </Link>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-5xl mx-auto px-6 lg:px-8 py-16">
-        
-        {/* Title & Category */}
-        <div className="mb-12">
+      <article className="max-w-3xl mx-auto px-6 lg:px-8 py-16">
+        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-white/40">
           {portfolio.category && (
-            <span className="text-sm text-slate-500 dark:text-white/40 uppercase tracking-wider">
-              {portfolio.category}
-            </span>
+            <span className="uppercase tracking-wider">{portfolio.category}</span>
           )}
-          <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">
-            {portfolio.title}
-          </h1>
-          
-          {/* Links */}
-          <div className="flex flex-wrap gap-4">
-            {portfolio.liveUrl && (
-              <a href={portfolio.liveUrl} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline">
-                  <ExternalLink size={16} className="mr-2" />
-                  View Live Site
-                </Button>
-              </a>
-            )}
-            {portfolio.copyright && (
-              <a href={portfolio.copyright} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline">
-                  <Github size={16} className="mr-2" />
-                  View Code
-                </Button>
-              </a>
-            )}
-          </div>
+          {portfolio.category && portfolio.projectDate && (
+            <span>·</span>
+          )}
+          {portfolio.projectDate && (
+            <ClientDate date={new Date(portfolio.projectDate).toISOString()} />
+          )}
         </div>
 
-        {/* Featured Image */}
-        {portfolio.imageUrl && (
-          <div className="aspect-video w-full overflow-hidden rounded-lg bg-slate-200 dark:bg-white/5 mb-12">
-            <Image
-              src={portfolio.imageUrl}
-              alt={portfolio.title}
-              width={1200}
-              height={675}
-              className="object-cover w-full h-full"
-            />
-          </div>
+        <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-8">
+          {portfolio.title}
+        </h1>
+
+        {portfolio.liveUrl && (
+          <a
+            href={portfolio.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition mb-8"
+          >
+            <ExternalLink size={14} />
+            View Live Site
+          </a>
         )}
 
-        {/* Description */}
         <ArticleContent
           html={resolveContent(portfolio.description)}
-          className="prose prose-slate dark:prose-invert prose-lg max-w-none mb-12"
+          className="prose prose-slate dark:prose-invert prose-lg max-w-none"
         />
 
-        {/* Meta Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-12 border-t border-slate-200 dark:border-white/10">
-          
-          {/* Tech Stack */}
-          {portfolio.stack && portfolio.stack.length > 0 && (
+        <div className="mt-12 pt-8 border-t border-slate-200 dark:border-white/10 grid grid-cols-2 gap-8">
+
+          {portfolio.projectDate && (
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-4">
-                Tech Stack
-              </h3>
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Completed</p>
+              <p className="text-sm text-slate-700 dark:text-white/70">
+                {new Date(portfolio.projectDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </p>
+            </div>
+          )}
+
+          {portfolio.complexity && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Scale</p>
+              <p className="text-sm text-slate-700 dark:text-white/70 capitalize">{portfolio.complexity}</p>
+            </div>
+          )}
+
+          {portfolio.stack && portfolio.stack.length > 0 && (
+            <div className="col-span-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Stack</p>
               <div className="flex flex-wrap gap-2">
                 {portfolio.stack.map((tech: string) => (
-                  <span 
-                    key={tech}
-                    className="px-3 py-1 bg-slate-200 dark:bg-white/10 rounded text-sm"
-                  >
+                  <span key={tech} className="px-3 py-1 bg-slate-200 dark:bg-white/10 rounded text-sm">
                     {tech}
                   </span>
                 ))}
@@ -115,18 +102,12 @@ export default async function PortfolioDetailPage({
             </div>
           )}
 
-          {/* Tags */}
           {portfolio.tags && portfolio.tags.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-4">
-                Tags
-              </h3>
+            <div className="col-span-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Tags</p>
               <div className="flex flex-wrap gap-2">
                 {portfolio.tags.map((tag: string) => (
-                  <span 
-                    key={tag}
-                    className="px-3 py-1 bg-slate-200 dark:bg-white/10 rounded text-sm"
-                  >
+                  <span key={tag} className="px-3 py-1 bg-slate-200 dark:bg-white/10 rounded text-sm">
                     {tag}
                   </span>
                 ))}
@@ -134,35 +115,8 @@ export default async function PortfolioDetailPage({
             </div>
           )}
 
-          {/* Project Date */}
-          {portfolio.projectDate && (
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-4">
-                Completed
-              </h3>
-              <p className="text-slate-700 dark:text-white/80">
-                {new Date(portfolio.projectDate).toLocaleDateString('en-US', {
-                  month: 'long',
-                  year: 'numeric'
-                })}
-              </p>
-            </div>
-          )}
-
-          {/* Complexity */}
-          {portfolio.complexity && (
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-white/40 mb-4">
-                Project Scale
-              </h3>
-              <p className="text-white/80 capitalize">
-                {portfolio.complexity} Project
-              </p>
-            </div>
-          )}
         </div>
-
-      </div>
+      </article>
     </div>
   )
 }
