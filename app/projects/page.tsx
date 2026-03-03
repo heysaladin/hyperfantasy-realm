@@ -344,7 +344,7 @@ export default function ProjectsPage() {
 
       {/* Search + Sort & Filter */}
       <div className="border-b border-slate-200 dark:border-white/10 sticky top-0 z-10 bg-white/95 dark:bg-black/95 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
           <div className="flex items-center gap-3">
 
             {/* Left: Search + meta toggle */}
@@ -368,10 +368,10 @@ export default function ProjectsPage() {
               <button
                 title={showMeta ? 'Image only' : 'Show details'}
                 onClick={() => setShowMeta(v => !v)}
-                className={`p-2 rounded-lg transition flex-shrink-0 ${
+                className={`px-2.5 py-2.5 rounded-lg border transition flex-shrink-0 ${
                   !showMeta
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10'
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-black border-slate-900 dark:border-white'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10'
                 }`}
               >
                 <Image size={15} />
