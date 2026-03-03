@@ -161,7 +161,7 @@ export default function ProjectsPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   const [search, setSearch] = useState('')
-  const [sort, setSort] = useState('newest')
+  const [sort, setSort] = useState('order')
   const [showMeta, setShowMeta] = useState(true)
   const [yearRange, setYearRange] = useState<[number, number] | null>(null)
 
@@ -230,7 +230,11 @@ export default function ProjectsPage() {
         result.sort((a, b) => a.title.localeCompare(b.title))
         break
       default:
-        result.sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
+        result.sort((a, b) => {
+          const orderDiff = (b.orderIndex ?? 0) - (a.orderIndex ?? 0)  // desc
+          if (orderDiff !== 0) return orderDiff
+          return new Date(b.projectDate ?? 0).getTime() - new Date(a.projectDate ?? 0).getTime()  // desc
+        })
     }
 
     return result
