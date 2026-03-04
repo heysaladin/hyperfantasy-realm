@@ -32,7 +32,7 @@ export default async function PortfolioDetailPage({
         <div className="max-w-3xl mx-auto px-6 lg:px-8 py-8">
           <Link href="/projects" className="inline-flex items-center text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition">
             <ArrowLeft size={20} className="mr-2" aria-hidden="true" />
-            Back to projects
+            Back to Projects
           </Link>
         </div>
       </div>

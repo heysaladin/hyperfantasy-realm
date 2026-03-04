@@ -661,7 +661,7 @@ export default function ProjectsPage() {
                   <div className="w-full max-w-4xl bg-white dark:bg-zinc-900 flex flex-col rounded-none sm:rounded-2xl overflow-hidden shadow-2xl h-full sm:h-auto sm:max-h-[88vh]">
 
                     {/* Panel header */}
-                    <div className="flex items-start justify-between gap-3 px-6 sm:px-8 py-4 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
+                    <div className="flex items-start justify-between gap-3 px-4 sm:px-6 pt-5 pb-4 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
                       <div className="min-w-0">
                         {selectedPortfolio.category && (
                           <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-1">
@@ -678,7 +678,7 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Scrollable body */}
-                    <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-6 space-y-6 min-h-0">
+                    <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-3 pb-7 space-y-6 min-h-0">
 
                       {selectedPortfolio.description && (
                         <ArticleContent
@@ -716,7 +716,7 @@ export default function ProjectsPage() {
                       <div className="flex items-center justify-between gap-3 pt-2">
                         <div className="flex items-center gap-3">
                           <Link href={`/projects/${selectedPortfolio.id}`}>
-                            <Button size="sm">View Full Project</Button>
+                            <Button size="sm" className="cursor-pointer px-3">View Full Project</Button>
                           </Link>
                           {selectedPortfolio.liveUrl && (
                             <a href={selectedPortfolio.liveUrl} target="_blank" rel="noopener noreferrer">

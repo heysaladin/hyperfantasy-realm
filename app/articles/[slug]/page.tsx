@@ -38,19 +38,18 @@ export default async function ArticleDetailPage({
   return (
     <div className={`${sourceSerif4.variable} min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors pt-16`}>
       <div className="border-b border-slate-200 dark:border-white/10">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 py-8">
-          <Link href="/articles" className="inline-flex items-center text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition mb-8">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8 py-6">
+          <Link href="/articles" className="inline-flex items-center text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition">
             <ArrowLeft size={20} className="mr-2" aria-hidden="true" />
             Back to Articles
           </Link>
         </div>
       </div>
 
-      <article className="max-w-3xl mx-auto px-6 lg:px-8 py-16">
+      <article className="max-w-3xl mx-auto px-6 lg:px-8 pt-10 pb-12">
         {blog.createdAt && <ClientDate date={blog.createdAt.toISOString()} />}
 
-        <h1 style={{ fontFamily: 'var(--font-source-serif), Georgia, "Times New Roman", serif' }}
-          className="text-4xl md:text-5xl font-bold mt-4 mb-8 leading-tight tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-8 leading-tight tracking-tight">
           {blog.title}
         </h1>
 
