@@ -49,7 +49,7 @@ export default async function TeamPage() {
               const opacity = index === team.length - 1 ? 'opacity-25' : index === team.length - 2 ? 'opacity-50' : ''
               return (
               <article key={member.id} className={`group ${opacity}`}>
-                <div className={`aspect-square bg-gradient-to-br ${member.gradient} rounded-lg mb-6 overflow-hidden border border-slate-200 dark:border-white/5`}>
+                <div className={`relative aspect-square bg-gradient-to-br ${member.gradient} rounded-lg mb-6 overflow-hidden border border-slate-200 dark:border-white/5`}>
                   {member.image ? (
                     index >= 1 && index <= 5
                       ? <TeamImageFlicker src={member.image} alt={member.name} />

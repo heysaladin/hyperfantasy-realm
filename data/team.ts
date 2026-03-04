@@ -55,7 +55,7 @@ export const team: TeamMember[] = [
     name: "Maya Chen",
     role: "UX Strategist",
     bio: "Maya bridges the gap between research and design, turning complex user needs into clear, elegant product experiences.",
-    image: "https://lh3.googleusercontent.com/keep-mapk/ANBdmBq0siwF4I_9EFevnmm-2lwQr9g3E3DZcTxExX7yQ7B7O5irmqxJ1IazpQIYFstfs4FPobgTI5p2ZFcA6vEJW35CYzqJsQOSpflPdJvg1avkRZsnW0FFvnIopM19DM-54cL3QHiQfNj5ATORCm95Zf0dVK1wPVO7msKi1x33nOC6YPHUkroi7Xd2HVtDVjLj00_WWzbmu2hJ_HjHsnW-ZbmZVBwmTIOxaokewBb3OGaG_pdH7EKEMhzUZ0Gidpt9njM65I7ey41ZCLFjEnl7LAgbDdnsOoPSMKx480EoO5Ud5tu9l-PO8TJasXp-V6rcu4f8hsxf0KdQJtks1lfWlVFRej5-2EEdskLx2hz85V3lWlDdp4J_TLgcLjS1uocFnhCQkrRZqJdW1fDQl7e4pUp8pWuY22IZhWMqEfTrLvDbSXiz656HQCVQPn6l_FLQ3sKdKhdrdq7ECJsaBWjVGLzHfs70e3xl5rFab9x8OGvjG19KecTxyeIzK0wSbgbsO9m5QfZzCOSRa2wuZO_FIB29HWmURcb9LeGh2EPqUi1Xq7PShK8RcpfU1BB1DKoIPOQyYRwA7fs7zf0l361th_vxbPqNDrhRleCgcM3qOYMRlzzNrxIOcV90OFGyVy55RiXYtwdh",
+    image: undefined,
     gradient: "from-pink-900/20 to-purple-900/20",
     social: {
       linkedin: "#",
@@ -79,7 +79,7 @@ export const team: TeamMember[] = [
     name: "Priya Nair",
     role: "Digital Strategist",
     bio: "Priya crafts the strategic frameworks that guide our clients' digital presence, connecting creative work to measurable growth.",
-    image: "https://pps.services.adobe.com/api/profile/DE916B3250F895B80A490D44@AdobeID/image/0abdd957-cfe4-4c19-ab52-f388ae66573d/276",
+    image: undefined,
     gradient: "from-blue-900/20 to-cyan-900/20",
     social: {
       linkedin: "#",
