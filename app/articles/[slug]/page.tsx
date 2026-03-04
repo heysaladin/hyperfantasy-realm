@@ -3,19 +3,10 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
-import { Source_Serif_4 } from 'next/font/google'
 import { ClientDate } from '@/components/client-date'
 import { resolveCoverImage } from '@/lib/cover-image'
 import { resolveContent } from '@/lib/tiptap-content'
 import { ArticleContent } from '@/components/article-content'
-
-const sourceSerif = Source_Serif_4({
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-source-serif',
-  display: 'swap',
-})
 
 async function getBlog(slug: string) {
   return await prisma.blog.findFirst({
@@ -46,7 +37,7 @@ export default async function ArticleDetailPage({
         </div>
       </div>
 
-      <article className={`max-w-3xl mx-auto px-6 lg:px-8 py-16 ${sourceSerif.variable}`}>
+      <article className="max-w-3xl mx-auto px-6 lg:px-8 py-16">
         {blog.createdAt && <ClientDate date={blog.createdAt.toISOString()} />}
 
         <h1 style={{ fontFamily: 'var(--font-source-serif), Georgia, "Times New Roman", serif' }}
