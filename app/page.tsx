@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { ArrowRight, Mail, Star, Monitor, Smile, ImageIcon, Box, Printer, Gem, Globe, Smartphone, PlayCircle } from 'lucide-react'
 import { testimonials } from '@/data/testimonials'
 import { resolveContentAsText } from '@/lib/tiptap-content'
 import { prisma } from '@/lib/prisma'
-import { HomeAboutCarousel } from '@/components/home-about-carousel'
-import { HomeFloatingCTA } from '@/components/home-floating-cta'
+
+const HomeAboutCarousel = dynamic(() => import('@/components/home-about-carousel').then(m => ({ default: m.HomeAboutCarousel })), { ssr: false })
+const HomeFloatingCTA   = dynamic(() => import('@/components/home-floating-cta').then(m => ({ default: m.HomeFloatingCTA })), { ssr: false })
 
 /* ── Design tokens ────────────────────────────────────────────────────── */
 const BG       = '#030017'
