@@ -4,6 +4,7 @@ import { testimonials } from '@/data/testimonials'
 import { resolveContentAsText } from '@/lib/tiptap-content'
 import { prisma } from '@/lib/prisma'
 import { HomeAboutCarousel } from '@/components/home-about-carousel'
+import { HomeFloatingCTA } from '@/components/home-floating-cta'
 
 /* ── Design tokens ────────────────────────────────────────────────────── */
 const BG       = '#030017'
@@ -288,20 +289,22 @@ export default async function Home() {
         </section>
 
         {/* ── CTA ──────────────────────────────────────────────── */}
-        <section className="py-24 px-6 lg:px-8 border-t border-black/10 dark:border-white/5">
+        <section id="hf-cta" className="py-24 px-6 lg:px-8 border-t border-black/10 dark:border-white/5">
           <div className="max-w-5xl mx-auto">
             <div className="hf-action rounded-3xl text-center text-white" style={{ padding: '100px 64px' }}>
               <h2 style={{ fontSize: 'clamp(32px,5vw,48px)', fontWeight: 600, lineHeight: '150%', marginBottom: 40 }}>
                 Have any awesome fantasy?
               </h2>
               <Link href="/enquiry">
-                <button className="grad-btn"><Mail size={18} /> Let&apos;s talk!</button>
+                <button id="hf-cta-btn" className="grad-btn"><Mail size={18} /> Let&apos;s talk!</button>
               </Link>
             </div>
           </div>
         </section>
 
       </div>
+
+      <HomeFloatingCTA ctaBtnId="hf-cta-btn" />
     </div>
   )
 }
