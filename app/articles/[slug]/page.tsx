@@ -3,10 +3,19 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
+import { Source_Serif_4 } from 'next/font/google'
 import { ClientDate } from '@/components/client-date'
 import { resolveCoverImage } from '@/lib/cover-image'
 import { resolveContent } from '@/lib/tiptap-content'
 import { ArticleContent } from '@/components/article-content'
+
+const sourceSerif4 = Source_Serif_4({
+  variable: '--font-source-serif',
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+})
 
 async function getBlog(slug: string) {
   return await prisma.blog.findFirst({
@@ -27,7 +36,7 @@ export default async function ArticleDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors pt-16">
+    <div className={`${sourceSerif4.variable} min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white transition-colors pt-16`}>
       <div className="border-b border-slate-200 dark:border-white/10">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 py-8">
           <Link href="/articles" className="inline-flex items-center text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition mb-8">
