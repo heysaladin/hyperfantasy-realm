@@ -15,7 +15,6 @@ const nextConfig = {
       { protocol: 'https', hostname: 'thinksoft.id' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'pps.services.adobe.com' },
-      { protocol: 'https', hostname: 'mir-s3-cdn-cf.behance.net' },
     ],
   },
 }
