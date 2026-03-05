@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { ArrowRight, Mail, Star, Monitor, Smile, ImageIcon, Box, Printer, Gem, Globe, Smartphone, PlayCircle } from 'lucide-react'
+import { EnquiryCTAButton } from '@/components/enquiry-cta-button'
 import { testimonials } from '@/data/testimonials'
 import { resolveContentAsText } from '@/lib/tiptap-content'
 import { prisma } from '@/lib/prisma'
@@ -101,10 +102,10 @@ export default async function Home() {
             <h1 style={{ fontSize: 'clamp(40px,7vw,86px)', fontWeight: 600, lineHeight: '135%' }}
               className="mb-10 dark:text-white text-slate-900">
               Leveraging design<br />&amp; tech to bring<br />
-              <span className="dark:text-white/30 text-slate-400">your fantasy life!</span>
+              <span style={{ background: GRADIENT, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>your fantasy life!</span>
             </h1>
-            <p className="text-lg dark:text-white/60 text-slate-600 mb-10">Have any fantasy?</p>
-            <Link href="/enquiry" className="grad-btn">Let&apos;s talk! <ArrowRight size={18} aria-hidden="true" /></Link>
+            <p className="text-lg dark:text-white/60 text-slate-600 mb-10">Have any awesome fantasy?</p>
+            <EnquiryCTAButton className="grad-btn">Let&apos;s talk! <ArrowRight size={18} aria-hidden="true" /></EnquiryCTAButton>
           </div>
         </section>
 
@@ -298,7 +299,7 @@ export default async function Home() {
               <h2 style={{ fontSize: 'clamp(32px,5vw,48px)', fontWeight: 600, lineHeight: '150%', marginBottom: 40 }}>
                 Have any awesome fantasy?
               </h2>
-              <Link href="/enquiry" id="hf-cta-btn" className="grad-btn"><Mail size={18} aria-hidden="true" /> Let&apos;s talk!</Link>
+              <EnquiryCTAButton id="hf-cta-btn" className="grad-btn"><Mail size={18} aria-hidden="true" /> Let&apos;s talk!</EnquiryCTAButton>
             </div>
           </div>
         </section>

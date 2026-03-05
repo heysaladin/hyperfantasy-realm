@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { ClientDate } from '@/components/client-date'
 import { resolveContent } from '@/lib/tiptap-content'
 import { ArticleContent } from '@/components/article-content'
+import { HomeFloatingCTA } from '@/components/home-floating-cta'
 
 async function getPortfolio(id: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/portfolios`, {
@@ -117,6 +118,8 @@ export default async function PortfolioDetailPage({
 
         </div>
       </article>
+
+      <HomeFloatingCTA ctaBtnId="" alwaysVisible />
     </div>
   )
 }

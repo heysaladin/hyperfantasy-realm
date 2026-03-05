@@ -8,6 +8,7 @@ import { ArrowDownAZ, ArrowDownWideNarrow, ArrowUpDown, ArrowUpNarrowWide, Chevr
 import { Button } from '@/components/ui/button'
 import { resolveContent, resolveContentAsText } from '@/lib/tiptap-content'
 import { ArticleContent } from '@/components/article-content'
+import { HomeFloatingCTA } from '@/components/home-floating-cta'
 
 const PAGE_SIZE = 9
 
@@ -739,6 +740,8 @@ export default function ProjectsPage() {
           </RadixDialog.Content>
         </RadixDialog.Portal>
       </RadixDialog.Root>
+
+      <HomeFloatingCTA ctaBtnId="" alwaysVisible />
     </div>
   )
 }
