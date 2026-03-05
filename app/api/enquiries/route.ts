@@ -3,8 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { NextRequest } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -32,7 +30,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Send email notification (non-blocking)
-    resend.emails.send({
+    new Resend(process.env.RESEND_API_KEY).emails.send({
       from: 'Hyperfantasy <onboarding@resend.dev>',
       to: 'hello.hyperfantasy@gmail.com',
       subject: `New Enquiry from ${enquiry.name}`,
