@@ -23,6 +23,8 @@ model Portfolio {
   projectDate DateTime? @map("project_date") @db.Date
   complexity  String?
   category    String?
+  colorHex    String?   @map("color_hex")
+  colorGroup  String?   @map("color_group")
   teamId      String?   @map("team_id") @db.Uuid
   creatorId   String?   @map("creator_id") @db.Uuid
   creator     Creator?  @relation(fields: [creatorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
