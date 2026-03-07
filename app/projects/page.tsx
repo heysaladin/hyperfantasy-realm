@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Dialog as RadixDialog } from 'radix-ui'
@@ -34,6 +34,100 @@ const SORT_OPTIONS = [
   { value: 'title',  label: 'A–Z',     icon: ArrowDownAZ },
 ]
 
+// ---------- masonry ----------
+
+const MASONRY_GAP = 32
+
+function useCols(): number {
+  const [cols, setCols] = useState(1)
+  useEffect(() => {
+    const update = () => setCols(window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+  return cols
+}
+
+function MasonryGrid({ items, gap, renderItem }: {
+  items: any[]
+  gap: number
+  renderItem: (item: any, index: number) => React.ReactNode
+}) {
+  const cols = useCols()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [positions, setPositions] = useState<{ x: number; y: number; w: number }[]>([])
+  const [containerH, setContainerH] = useState(0)
+
+  const compute = useCallback(() => {
+    const el = containerRef.current
+    if (!el || el.offsetWidth === 0) return
+    const totalW = el.offsetWidth
+    const colW = (totalW - gap * (cols - 1)) / cols
+    const colHeights = new Array(cols).fill(0)
+    const newPos = items.map((_, i) => {
+      const h = itemRefs.current[i]?.offsetHeight || 200
+      const col = colHeights.indexOf(Math.min(...colHeights))
+      const pos = { x: col * (colW + gap), y: colHeights[col], w: colW }
+      colHeights[col] += h + gap
+      return pos
+    })
+    setPositions(newPos)
+    setContainerH(Math.max(0, Math.max(0, ...colHeights) - gap))
+  }, [items, cols, gap])
+
+  // Recompute synchronously before paint on items/cols change
+  useLayoutEffect(() => {
+    itemRefs.current = itemRefs.current.slice(0, items.length)
+    compute()
+  }, [items, cols]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Recompute when container width changes (window resize handled by useCols, but also flex/layout shifts)
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const obs = new ResizeObserver(compute)
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [compute])
+
+  // Recompute when any item's height changes (image load, showMeta toggle, etc.)
+  useEffect(() => {
+    const observers: ResizeObserver[] = []
+    itemRefs.current.forEach(el => {
+      if (!el) return
+      const obs = new ResizeObserver(compute)
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach(o => o.disconnect())
+  }, [items, compute])
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', height: containerH }}>
+      {items.map((item, i) => {
+        const pos = positions[i]
+        return (
+          <div
+            key={item.id}
+            ref={el => { itemRefs.current[i] = el }}
+            style={{
+              position: 'absolute',
+              left: pos?.x ?? 0,
+              top: pos?.y ?? 0,
+              width: pos?.w ?? '100%',
+              transition: 'top 0.25s ease, left 0.25s ease',
+            }}
+          >
+            {renderItem(item, i)}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 // ---------- sub-components ----------
 
 function useLazyVisible() {
@@ -57,7 +151,7 @@ function PortfolioCard({ portfolio, index, onClick, showMeta }: { portfolio: any
   // Stagger only for the first page (initial load); scroll-in cards animate instantly
   const delay = index < PAGE_SIZE ? index * 50 : 0
   return (
-    <div ref={ref} onClick={onClick} className="group block cursor-pointer break-inside-avoid mb-8"
+    <div ref={ref} onClick={onClick} className="group block cursor-pointer"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(16px)',
@@ -618,13 +712,19 @@ export default function ProjectsPage() {
 
       {/* Grid */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-12 pb-16">
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-8">
-          {isLoading
-            ? Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} showMeta={showMeta} />)
-            : displayed.map((portfolio, index) => (
-                <PortfolioCard key={portfolio.id} portfolio={portfolio} index={index} onClick={() => handleClick(portfolio)} showMeta={showMeta} />
-              ))}
-        </div>
+        {isLoading ? (
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-8">
+            {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} showMeta={showMeta} />)}
+          </div>
+        ) : (
+          <MasonryGrid
+            items={displayed}
+            gap={MASONRY_GAP}
+            renderItem={(portfolio, index) => (
+              <PortfolioCard portfolio={portfolio} index={index} onClick={() => handleClick(portfolio)} showMeta={showMeta} />
+            )}
+          />
+        )}
 
         {/* Empty state */}
         {!isLoading && filtered.length === 0 && (
