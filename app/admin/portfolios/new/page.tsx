@@ -20,6 +20,7 @@ export default function NewPortfolioPage() {
   const [loading, setLoading] = useState(false)
   const [extractingColor, setExtractingColor] = useState(false)
   const [tagInput, setTagInput] = useState('')
+  const [stackInput, setStackInput] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -27,7 +28,7 @@ export default function NewPortfolioPage() {
     liveUrl: '',
     copyright: '',
     tags: [] as string[],
-    stack: '',
+    stack: [] as string[],
     category: '',
     complexity: 'long',
     projectDate: '',
@@ -65,9 +66,7 @@ export default function NewPortfolioPage() {
         liveUrl: formData.liveUrl || null,
         copyright: formData.copyright || null,
         tags: formData.tags,
-        stack: formData.stack 
-            ? formData.stack.split(',').map(s => s.trim()).filter(Boolean) 
-            : [],
+        stack: formData.stack,
         complexity: formData.complexity || null,
         category: formData.category || null,
         projectDate: formData.projectDate || null,
@@ -290,14 +289,44 @@ export default function NewPortfolioPage() {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="stack">Tech Stack</Label>
-            <Input
-              id="stack"
-              value={formData.stack}
-              onChange={(e) => setFormData({...formData, stack: e.target.value})}
-              className="bg-slate-50 dark:bg-white/5"
-              placeholder="Next.js, React, Tailwind (comma separated)"
-            />
+            <Label htmlFor="stack-input">Tech Stack</Label>
+            <div
+              className="flex flex-wrap gap-1.5 items-center min-h-10 px-3 py-2 rounded-md border border-input bg-slate-50 dark:bg-white/5 cursor-text"
+              onClick={() => document.getElementById('stack-input')?.focus()}
+            >
+              {formData.stack.map(item => (
+                <span key={item} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-slate-200 dark:bg-white/15 text-slate-700 dark:text-white/80">
+                  {item}
+                  <button
+                    type="button"
+                    onClick={() => setFormData(f => ({ ...f, stack: f.stack.filter(s => s !== item) }))}
+                    className="hover:text-red-500 transition-colors"
+                    aria-label={`Remove ${item}`}
+                  >
+                    <X size={11} />
+                  </button>
+                </span>
+              ))}
+              <input
+                id="stack-input"
+                value={stackInput}
+                onChange={e => setStackInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault()
+                    const val = stackInput.trim().replace(/,$/, '')
+                    if (val && !formData.stack.includes(val)) {
+                      setFormData(f => ({ ...f, stack: [...f.stack, val] }))
+                    }
+                    setStackInput('')
+                  } else if (e.key === 'Backspace' && !stackInput && formData.stack.length) {
+                    setFormData(f => ({ ...f, stack: f.stack.slice(0, -1) }))
+                  }
+                }}
+                placeholder={formData.stack.length ? '' : 'Add technology…'}
+                className="flex-1 min-w-24 bg-transparent outline-none text-sm placeholder:text-slate-400 dark:placeholder:text-white/30"
+              />
+            </div>
           </div>
         </div>
 

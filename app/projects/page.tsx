@@ -10,6 +10,8 @@ import { resolveContent, resolveContentAsText } from '@/lib/tiptap-content'
 import { colorGroupFromHex } from '@/lib/color-group'
 import { ArticleContent } from '@/components/article-content'
 import { HomeFloatingCTA } from '@/components/home-floating-cta'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 const PAGE_SIZE = 9
 
@@ -312,6 +314,17 @@ function RangeSlider({ min, max, value, onChange }: {
 export default function ProjectsPage() {
   const router = useRouter()
 
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
   // All portfolios fetched once
   const [allPortfolios, setAllPortfolios] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -323,7 +336,7 @@ export default function ProjectsPage() {
   const [showMeta, setShowMeta] = useState(true)
   const [yearRange, setYearRange] = useState<[number, number] | null>(null)
   const [colorGroup, setColorGroup] = useState('')
-  const [showHiddenOnly, setShowHiddenOnly] = useState(false)
+  const [showVisibleOnly, setShowVisibleOnly] = useState(true)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isSortOpen, setIsSortOpen] = useState(false)
 
@@ -382,7 +395,11 @@ export default function ProjectsPage() {
     )
     if (colorGroup) result = result.filter(p => resolveColorGroup(p) === colorGroup)
 
-    if (showHiddenOnly) result = result.filter(p => !p.isVisible)
+    if (user) {
+      result = result.filter(p => showVisibleOnly ? p.isVisible !== false : p.isVisible === false)
+    } else {
+      result = result.filter(p => p.isVisible !== false)
+    }
 
     if (yearRange && dataYears && (yearRange[0] > dataYears.min || yearRange[1] < dataYears.max)) {
       result = result.filter(p => {
@@ -413,12 +430,12 @@ export default function ProjectsPage() {
     }
 
     return result
-  }, [allPortfolios, search, sort, category, complexity, colorGroup, yearRange, dataYears, showHiddenOnly])
+  }, [allPortfolios, search, sort, category, complexity, colorGroup, yearRange, dataYears, showVisibleOnly, user])
 
   // Reset display count when filters change
   useEffect(() => {
     setDisplayCount(PAGE_SIZE)
-  }, [search, sort, category, complexity, colorGroup, yearRange, showHiddenOnly])
+  }, [search, sort, category, complexity, colorGroup, yearRange, showVisibleOnly])
 
   const displayed = filtered.slice(0, displayCount)
   const hasMore = displayCount < filtered.length
@@ -499,7 +516,7 @@ export default function ProjectsPage() {
     setCategory('')
     setComplexity('')
     setColorGroup('')
-    setShowHiddenOnly(false)
+    setShowVisibleOnly(true)
     if (dataYears) setYearRange([dataYears.min, dataYears.max])
   }
 
@@ -508,7 +525,7 @@ export default function ProjectsPage() {
     category !== '',
     complexity !== '',
     colorGroup !== '',
-    showHiddenOnly,
+    user && !showVisibleOnly,
     dataYears && yearRange && (yearRange[0] > dataYears.min || yearRange[1] < dataYears.max),
   ].filter(Boolean).length
 
@@ -684,21 +701,6 @@ export default function ProjectsPage() {
                     </div>
                   </div>
 
-                  {/* Visibility section */}
-                  <div className="p-4 border-b border-slate-100 dark:border-white/10">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">Visibility</p>
-                    <button
-                      onClick={() => setShowHiddenOnly(v => !v)}
-                      className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                        showHiddenOnly
-                          ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
-                          : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10'
-                      }`}
-                    >
-                      Hidden only
-                    </button>
-                  </div>
-
                   {/* Color group section */}
                   <div className="p-4 border-b border-slate-100 dark:border-white/10">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">Color</p>
@@ -744,6 +746,25 @@ export default function ProjectsPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* Visibility section — logged-in only */}
+                  {user && <div className="p-4 border-b border-slate-100 dark:border-white/10">
+                    <button
+                      role="switch"
+                      aria-checked={showVisibleOnly}
+                      onClick={() => setShowVisibleOnly(v => !v)}
+                      className="flex items-center justify-between w-full group"
+                    >
+                      <span className={`text-xs font-medium transition-colors ${showVisibleOnly ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-white/40'}`}>Show visible projects</span>
+                      <span className={`relative inline-flex h-5 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-none ${
+                        showVisibleOnly ? 'bg-slate-900 dark:bg-white' : 'bg-slate-200 dark:bg-white/10'
+                      }`}>
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-zinc-900 shadow transition-transform duration-200 ${
+                          showVisibleOnly ? 'translate-x-4' : 'translate-x-0'
+                        }`} />
+                      </span>
+                    </button>
+                  </div>}
 
                   {/* Footer: Reset All + Apply */}
                   <div className="p-4 flex gap-2">
@@ -811,13 +832,16 @@ export default function ProjectsPage() {
           <RadixDialog.Content
             aria-describedby={undefined}
             className="fixed inset-0 z-50 flex items-end sm:items-start justify-center sm:pt-10 sm:px-4 sm:pb-4 outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+            onClick={() => setSelectedPortfolio(null)}
           >
             {selectedPortfolio && (
               <>
                 <RadixDialog.Title className="sr-only">{selectedPortfolio.title}</RadixDialog.Title>
 
                   {/* ── Info panel ── */}
-                  <div className="w-full max-w-4xl bg-white dark:bg-zinc-900 flex flex-col rounded-none sm:rounded-2xl overflow-hidden shadow-2xl h-full sm:h-auto sm:max-h-[88vh]">
+                  <div className="w-full max-w-4xl bg-white dark:bg-zinc-900 flex flex-col rounded-none sm:rounded-2xl overflow-hidden shadow-2xl h-full sm:h-auto sm:max-h-[88vh]"
+                    onClick={e => e.stopPropagation()}
+                  >
 
                     {/* Panel header */}
                     <div className="flex items-start justify-between gap-3 px-4 sm:px-6 pt-5 pb-4 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
@@ -875,7 +899,7 @@ export default function ProjectsPage() {
                       <div className="flex items-center justify-between gap-3 pt-2">
                         <div className="flex items-center gap-3">
                           <Link href={`/projects/${selectedPortfolio.id}`}>
-                            <Button size="sm" className="cursor-pointer px-3">View Full Project</Button>
+                            <Button variant="outline" size="sm" className="cursor-pointer px-3">View Full Project</Button>
                           </Link>
                           {selectedPortfolio.liveUrl && (
                             <a href={selectedPortfolio.liveUrl} target="_blank" rel="noopener noreferrer">
