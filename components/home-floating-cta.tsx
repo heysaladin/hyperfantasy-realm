@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Send, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,7 +27,7 @@ function validate(formData: typeof EMPTY) {
   return errs
 }
 
-export function HomeFloatingCTA({ ctaBtnId, alwaysVisible }: { ctaBtnId: string; alwaysVisible?: boolean }) {
+export function HomeFloatingCTA({ ctaBtnId, alwaysVisible, scrollThreshold = 0 }: { ctaBtnId: string; alwaysVisible?: boolean; scrollThreshold?: number }) {
   const [visible, setVisible]   = useState(!!alwaysVisible)
   const [open, setOpen]         = useState(false)
   const [loading, setLoading]   = useState(false)
@@ -35,9 +36,24 @@ export function HomeFloatingCTA({ ctaBtnId, alwaysVisible }: { ctaBtnId: string;
   const [formData, setFormData] = useState(EMPTY)
   const [fieldErrors, setFieldErrors] = useState(EMPTY_ERRORS)
 
+  const [mounted, setMounted]   = useState(false)
+  const [rendered, setRendered] = useState(false)
+
   const triggerRef  = useRef<HTMLButtonElement>(null)
   const dialogRef   = useRef<HTMLDivElement>(null)
   const headingId   = 'enquiry-modal-title'
+
+  useEffect(() => { setMounted(true) }, [])
+
+  // Keep button in DOM during exit animation
+  useEffect(() => {
+    if (visible) {
+      setRendered(true)
+    } else {
+      const t = setTimeout(() => setRendered(false), 400)
+      return () => clearTimeout(t)
+    }
+  }, [visible])
 
   // Listen for external triggers (e.g. hero / bottom CTA buttons)
   useEffect(() => {
@@ -48,28 +64,41 @@ export function HomeFloatingCTA({ ctaBtnId, alwaysVisible }: { ctaBtnId: string;
 
   // Scroll visibility (skipped when alwaysVisible)
   useEffect(() => {
+    if (!mounted) return
     if (alwaysVisible) return
     const ctaBtn = document.getElementById(ctaBtnId)
     if (!ctaBtn) return
-    const check = () => {
-      const rect      = ctaBtn.getBoundingClientRect()
-      const ctaInView = rect.top < window.innerHeight && rect.bottom > 0
-      const scrolled  = window.scrollY > 300
-      if (scrolled && !ctaInView) {
-        setVisible(true)
-        ctaBtn.style.visibility = 'hidden'
-      } else {
-        setVisible(false)
-        ctaBtn.style.visibility = 'visible'
-      }
+    let ctaOutOfView = false
+    let scrolledEnough = scrollThreshold === 0
+
+    const update = () => {
+      const show = ctaOutOfView && scrolledEnough
+      setVisible(show)
+      ctaBtn.style.visibility = show ? 'hidden' : 'visible'
     }
-    window.addEventListener('scroll', check, { passive: true })
-    check()
+
+    const observer = new IntersectionObserver(([entry]) => {
+      ctaOutOfView = !entry.isIntersecting
+      update()
+    }, { threshold: 0.1 })
+
+    const onScroll = () => {
+      scrolledEnough = window.scrollY > scrollThreshold
+      update()
+    }
+
+    observer.observe(ctaBtn)
+    if (scrollThreshold > 0) {
+      window.addEventListener('scroll', onScroll, { passive: true })
+      onScroll()
+    }
+
     return () => {
-      window.removeEventListener('scroll', check)
+      observer.disconnect()
+      window.removeEventListener('scroll', onScroll)
       ctaBtn.style.visibility = 'visible'
     }
-  }, [ctaBtnId])
+  }, [ctaBtnId, alwaysVisible, mounted, scrollThreshold])
 
   // Lock scroll + focus first input + Escape key when modal opens
   useEffect(() => {
@@ -164,39 +193,46 @@ export function HomeFloatingCTA({ ctaBtnId, alwaysVisible }: { ctaBtnId: string;
 
   return (
     <>
-      {/* Floating trigger button */}
-      <div style={{
-        position:     'fixed',
-        bottom:        32,
-        right:         32,
-        zIndex:        50,
-        transform:     visible ? 'translateY(0)' : 'translateY(120px)',
-        transition:    'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)',
-        pointerEvents: visible ? 'auto' : 'none',
-      }}>
-        <button
-          ref={triggerRef}
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Open enquiry form — Let's talk!"
-          aria-haspopup="dialog"
-          style={{
-            background:     GRADIENT,
-            color:          '#fff',
-            borderRadius:   '50%',
-            width:           56,
-            height:          56,
-            display:        'inline-flex',
-            alignItems:     'center',
-            justifyContent: 'center',
-            boxShadow:      '0 8px 32px rgba(0,0,0,0.3)',
-            border:         'none',
-            cursor:         'pointer',
-          }}
-        >
-          <Send size={22} aria-hidden="true" />
-        </button>
-      </div>
+      {/* Floating trigger button — portalled to body, only rendered when visible */}
+      {mounted && rendered && createPortal(
+        <div style={{
+          position:  'fixed',
+          bottom:     32,
+          right:      32,
+          zIndex:     50,
+          animation: visible
+            ? 'hfSlideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards'
+            : 'hfSlideDown 0.4s ease forwards',
+        }}>
+          <style>{`
+            @keyframes hfSlideUp   { from { transform: translateY(80px); opacity: 0 } to { transform: none; opacity: 1 } }
+            @keyframes hfSlideDown { from { transform: none; opacity: 1 } to { transform: translateY(80px); opacity: 0 } }
+          `}</style>
+          <button
+            ref={triggerRef}
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="Open enquiry form — Let's talk!"
+            aria-haspopup="dialog"
+            style={{
+              background:     GRADIENT,
+              color:          '#fff',
+              borderRadius:   '50%',
+              width:           56,
+              height:          56,
+              display:        'inline-flex',
+              alignItems:     'center',
+              justifyContent: 'center',
+              boxShadow:      '0 8px 32px rgba(0,0,0,0.3)',
+              border:         'none',
+              cursor:         'pointer',
+            }}
+          >
+            <Send size={22} aria-hidden="true" />
+          </button>
+        </div>,
+        document.body
+      )}
 
       {/* Modal backdrop */}
       {open && (

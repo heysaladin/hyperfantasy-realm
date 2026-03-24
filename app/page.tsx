@@ -306,7 +306,7 @@ export default async function Home() {
 
       </div>
 
-      <HomeFloatingCTA ctaBtnId="hf-cta-btn" />
+      <HomeFloatingCTA ctaBtnId="hf-cta-btn" scrollThreshold={300} />
     </div>
   )
 }
