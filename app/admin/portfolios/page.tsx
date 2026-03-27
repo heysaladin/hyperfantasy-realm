@@ -71,6 +71,7 @@ export default function AdminPortfoliosPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [jumpInput, setJumpInput] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('order-desc')
+  const [categoryFilter, setCategoryFilter] = useState('all')
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -83,7 +84,10 @@ export default function AdminPortfoliosPage() {
     setPortfolios(Array.isArray(data) ? data : [])
   }
 
+  const categories = Array.from(new Set(portfolios.map((p: any) => p.category).filter(Boolean))).sort()
+
   const filtered = sortPortfolios(portfolios, sortBy).filter((p: any) => {
+    if (categoryFilter !== 'all' && p.category !== categoryFilter) return false
     if (!search) return true
     const q = search.toLowerCase()
     return (
@@ -108,6 +112,11 @@ export default function AdminPortfoliosPage() {
 
   const handleSort = (value: string) => {
     setSortBy(value as SortOption)
+    setCurrentPage(1)
+  }
+
+  const handleCategoryFilter = (value: string) => {
+    setCategoryFilter(value)
     setCurrentPage(1)
   }
 
@@ -139,7 +148,7 @@ export default function AdminPortfoliosPage() {
         <div>
           <h1 className="text-3xl font-bold">Portfolios</h1>
           <p className="text-slate-600 dark:text-white/60 text-sm mt-1">
-            {search
+            {search || categoryFilter !== 'all'
               ? `${filtered.length} of ${portfolios.length} portfolios`
               : `Total: ${portfolios.length} portfolios`}
           </p>
@@ -163,6 +172,17 @@ export default function AdminPortfoliosPage() {
             className="pl-9 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10"
           />
         </div>
+        <Select value={categoryFilter} onValueChange={handleCategoryFilter}>
+          <SelectTrigger className="w-40 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories.map((cat: string) => (
+              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Select value={sortBy} onValueChange={handleSort}>
           <SelectTrigger className="w-40 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10">
             <ArrowUpDown size={14} className="mr-1 text-slate-400 dark:text-white/40" aria-hidden="true" />
@@ -245,7 +265,7 @@ export default function AdminPortfoliosPage() {
 
         {paginatedData.length === 0 && (
           <div className="p-8 text-center text-slate-500 dark:text-white/40">
-            {search ? 'No portfolios match your search' : 'No portfolios found'}
+            {search || categoryFilter !== 'all' ? 'No portfolios match your filters' : 'No portfolios found'}
           </div>
         )}
       </div>
