@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Pencil, Trash2, Search, ArrowUpDown } from 'lucide-react'
+import { Plus, Pencil, Trash2, Search, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { resolveContentAsText } from '@/lib/tiptap-content'
 import {
@@ -31,7 +31,21 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'title-desc', label: 'Title Z→A' },
 ]
 
-function sortPortfolios(list: any[], sort: SortOption): any[] {
+type ColumnSort = { field: 'complexity' | 'visible' | 'featured'; dir: 'asc' | 'desc' } | null
+
+function sortPortfolios(list: any[], sort: SortOption, columnSort: ColumnSort): any[] {
+  if (columnSort) {
+    const { field, dir } = columnSort
+    const mult = dir === 'asc' ? 1 : -1
+    return [...list].sort((a, b) => {
+      switch (field) {
+        case 'complexity': return mult * (a.complexity ?? '').localeCompare(b.complexity ?? '')
+        case 'visible':    return mult * ((a.isVisible ? 1 : 0) - (b.isVisible ? 1 : 0))
+        case 'featured':   return mult * ((a.isFeatured ? 1 : 0) - (b.isFeatured ? 1 : 0))
+        default: return 0
+      }
+    })
+  }
   return [...list].sort((a, b) => {
     switch (sort) {
       case 'order-desc': return (b.orderIndex ?? 0) - (a.orderIndex ?? 0)
@@ -43,6 +57,30 @@ function sortPortfolios(list: any[], sort: SortOption): any[] {
       default: return 0
     }
   })
+}
+
+function SortableColHeader({ label, field, columnSort, onToggle }: {
+  label: string
+  field: 'complexity' | 'visible' | 'featured'
+  columnSort: ColumnSort
+  onToggle: (f: 'complexity' | 'visible' | 'featured') => void
+}) {
+  const isActive = columnSort?.field === field
+  const isAsc = isActive && columnSort?.dir === 'asc'
+  const isDesc = isActive && columnSort?.dir === 'desc'
+  return (
+    <button
+      onClick={() => onToggle(field)}
+      className={`inline-flex items-center gap-1 font-semibold transition hover:text-slate-900 dark:hover:text-white ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-white/40'}`}
+    >
+      {label}
+      {isAsc
+        ? <ArrowUp size={12} aria-hidden="true" />
+        : isDesc
+          ? <ArrowDown size={12} aria-hidden="true" />
+          : <ArrowUpDown size={12} aria-hidden="true" className="opacity-40" />}
+    </button>
+  )
 }
 
 function getPageNumbers(current: number, total: number): (number | '...')[] {
@@ -71,6 +109,7 @@ export default function AdminPortfoliosPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [jumpInput, setJumpInput] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('order-desc')
+  const [columnSort, setColumnSort] = useState<ColumnSort>(null)
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
@@ -86,7 +125,15 @@ export default function AdminPortfoliosPage() {
 
   const categories = Array.from(new Set(portfolios.map((p: any) => p.category).filter(Boolean))).sort()
 
-  const filtered = sortPortfolios(portfolios, sortBy).filter((p: any) => {
+  const toggleColumnSort = (field: 'complexity' | 'visible' | 'featured') => {
+    setColumnSort(prev => {
+      if (prev?.field === field) return { field, dir: prev.dir === 'desc' ? 'asc' : 'desc' }
+      return { field, dir: 'desc' }
+    })
+    setCurrentPage(1)
+  }
+
+  const filtered = sortPortfolios(portfolios, sortBy, columnSort).filter((p: any) => {
     if (categoryFilter !== 'all' && p.category !== categoryFilter) return false
     if (!search) return true
     const q = search.toLowerCase()
@@ -112,6 +159,7 @@ export default function AdminPortfoliosPage() {
 
   const handleSort = (value: string) => {
     setSortBy(value as SortOption)
+    setColumnSort(null)
     setCurrentPage(1)
   }
 
@@ -183,10 +231,10 @@ export default function AdminPortfoliosPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={sortBy} onValueChange={handleSort}>
+        <Select value={columnSort ? '' : sortBy} onValueChange={handleSort}>
           <SelectTrigger className="w-40 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10">
             <ArrowUpDown size={14} className="mr-1 text-slate-400 dark:text-white/40" aria-hidden="true" />
-            <SelectValue />
+            <SelectValue placeholder={columnSort ? 'Column sort' : undefined} />
           </SelectTrigger>
           <SelectContent>
             {SORT_OPTIONS.map(opt => (
@@ -194,6 +242,18 @@ export default function AdminPortfoliosPage() {
             ))}
           </SelectContent>
         </Select>
+        {columnSort && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { setColumnSort(null); setCurrentPage(1) }}
+            className="flex items-center gap-1.5 text-slate-500 dark:text-white/40"
+            title="Reset column sort"
+          >
+            <RotateCcw size={13} aria-hidden="true" />
+            Reset
+          </Button>
+        )}
         <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPage}>
           <SelectTrigger className="w-32 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10">
             <SelectValue />
@@ -213,8 +273,15 @@ export default function AdminPortfoliosPage() {
             <tr>
               <th className="text-left p-4 font-semibold">Title</th>
               <th className="text-left p-4 font-semibold">Category</th>
-              <th className="text-left p-4 font-semibold">Complexity</th>
-              <th className="text-left p-4 font-semibold">Status</th>
+              <th className="text-left p-4 font-semibold">
+                <SortableColHeader label="Complexity" field="complexity" columnSort={columnSort} onToggle={toggleColumnSort} />
+              </th>
+              <th className="text-left p-4 font-semibold">
+                <SortableColHeader label="Publish" field="visible" columnSort={columnSort} onToggle={toggleColumnSort} />
+              </th>
+              <th className="text-left p-4 font-semibold">
+                <SortableColHeader label="Featured" field="featured" columnSort={columnSort} onToggle={toggleColumnSort} />
+              </th>
               <th className="text-right p-4 font-semibold">Actions</th>
             </tr>
           </thead>
@@ -245,7 +312,16 @@ export default function AdminPortfoliosPage() {
                       ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
                       : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'
                   }`}>
-                    {portfolio.isVisible ? 'Visible' : 'Hidden'}
+                    {portfolio.isVisible ? 'Published' : 'Hidden'}
+                  </span>
+                </td>
+                <td className="p-4">
+                  <span className={`px-2 py-1 text-xs rounded ${
+                    portfolio.isFeatured
+                      ? 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400'
+                      : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/30'
+                  }`}>
+                    {portfolio.isFeatured ? 'Featured' : '—'}
                   </span>
                 </td>
                 <td className="p-4">

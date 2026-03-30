@@ -21,6 +21,13 @@ export default function ArticlesPage() {
   const searchBarRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    fetch('/api/settings', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(data => { if (data.showDrafts) setShowAllBlogs(true) })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
@@ -42,7 +49,7 @@ export default function ArticlesPage() {
 
   const filtered = useMemo(() => {
     let result = allBlogs
-    if (!showAllBlogs || !user) {
+    if (!showAllBlogs) {
       result = result.filter(b => b.isPublished)
     }
     if (!search.trim()) return result
@@ -52,7 +59,7 @@ export default function ArticlesPage() {
       b.tags?.some((t: string) => t.toLowerCase().includes(q)) ||
       b.excerpt?.toLowerCase().includes(q)
     )
-  }, [allBlogs, search, showAllBlogs, user])
+  }, [allBlogs, search, showAllBlogs])
 
   // Reset to page 1 when search changes
   useEffect(() => { setPage(1) }, [search])

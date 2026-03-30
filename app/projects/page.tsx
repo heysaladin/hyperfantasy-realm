@@ -13,6 +13,8 @@ import { HomeFloatingCTA } from '@/components/home-floating-cta'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
+type TagShortcut = { id: string; name: string }
+
 const PAGE_SIZE = 9
 
 const CATEGORIES = [
@@ -343,6 +345,15 @@ export default function ProjectsPage() {
       setUser(session?.user ?? null)
     })
     return () => subscription.unsubscribe()
+  }, [])
+
+  // Tag shortcuts
+  const [tagShortcuts, setTagShortcuts] = useState<TagShortcut[]>([])
+  useEffect(() => {
+    fetch('/api/tags')
+      .then(r => r.json())
+      .then(data => setTagShortcuts(Array.isArray(data) ? data : []))
+      .catch(() => setTagShortcuts([]))
   }, [])
 
   // All portfolios fetched once
@@ -830,8 +841,32 @@ export default function ProjectsPage() {
             </div>
 
           </div>
+
         </div>
       </div>
+
+      {/* Tag shortcuts bar — desktop only */}
+      {tagShortcuts.length > 0 && (
+        <div className="hidden lg:block border-b border-slate-200 dark:border-white/10 bg-white dark:bg-black">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-2">
+            <div className="flex flex-wrap gap-1.5">
+              {tagShortcuts.map(tag => (
+                <button
+                  key={tag.id}
+                  onClick={() => setSearch(search === tag.name ? '' : tag.name)}
+                  className={`px-2.5 py-1 text-xs rounded-full border transition ${
+                    search === tag.name
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-black border-slate-900 dark:border-white'
+                      : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10'
+                  }`}
+                >
+                  {tag.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Grid */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-12 pb-16">

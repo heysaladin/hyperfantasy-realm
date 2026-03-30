@@ -59,7 +59,7 @@ export default function PortfolioDetailPage() {
             )}
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-8 leading-tight">
             {portfolio.title}
           </h1>
 
@@ -139,10 +139,17 @@ export default function PortfolioDetailPage() {
               <Mail size={18} aria-hidden="true" /> Let&apos;s talk!
             </EnquiryCTAButton>
           </div>
+
+          <div className="mt-10 text-center">
+            <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition">
+              <ArrowLeft size={15} aria-hidden="true" />
+              Back to Projects
+            </Link>
+          </div>
         </article>
       ) : null}
 
-      <HomeFloatingCTA ctaBtnId="project-cta-btn" />
+      <HomeFloatingCTA ctaBtnId="project-cta-btn" alwaysVisible />
     </div>
   )
 }
