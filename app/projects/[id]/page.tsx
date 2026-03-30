@@ -45,7 +45,7 @@ export default function PortfolioDetailPage() {
         </div>
       </div>
 
-      {portfolio ? (
+      {portfolio ? (<>
         <article className="max-w-3xl mx-auto px-6 lg:px-8 pt-10 pb-12">
           <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-white/40">
             {portfolio.category && (
@@ -147,9 +147,8 @@ export default function PortfolioDetailPage() {
             </Link>
           </div>
         </article>
-      ) : null}
-
-      <HomeFloatingCTA ctaBtnId="project-cta-btn" alwaysVisible />
+        <HomeFloatingCTA ctaBtnId="project-cta-btn" />
+      </>) : null}
     </div>
   )
 }
