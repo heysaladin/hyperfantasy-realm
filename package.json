@@ -10,6 +10,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@next/third-parties": "^16.2.1",
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
     "@supabase/ssr": "^0.8.0",
@@ -32,6 +33,7 @@
     "node-vibrant": "^4.0.4",
     "pg": "^8.19.0",
     "postgres": "^3.4.8",
+    "posthog-js": "^1.364.1",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
