@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Eye, EyeOff, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Eye, EyeOff, FileText, Search, SearchX, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ArticleContent } from '@/components/article-content'
 import { resolveContent } from '@/lib/tiptap-content'
 import { createClient } from '@/lib/supabase/client'
@@ -215,7 +215,11 @@ export default function ArticlesPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
+          <div className="text-center py-16 flex flex-col items-center gap-3">
+            {search
+              ? <SearchX size={36} strokeWidth={1.25} className="text-slate-300 dark:text-white/20" aria-hidden="true" />
+              : <FileText size={36} strokeWidth={1.25} className="text-slate-300 dark:text-white/20" aria-hidden="true" />
+            }
             <p className="text-slate-500 dark:text-white/40">
               {search ? `No articles found for "${search}"` : 'No articles published yet.'}
             </p>
