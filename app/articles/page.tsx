@@ -23,7 +23,7 @@ export default function ArticlesPage() {
   useEffect(() => {
     fetch('/api/settings', { cache: 'no-store' })
       .then(r => r.json())
-      .then(data => { if (data.showDrafts) setShowAllBlogs(true) })
+      .then(data => { if (data.showDrafts) setShowAllBlogs(false) })
       .catch(() => {})
   }, [])
 
