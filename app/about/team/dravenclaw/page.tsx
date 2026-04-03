@@ -20,7 +20,7 @@ export default async function DravenclawPage() {
         { projectDate: { gte: new Date('2011-01-01') } },
       ],
     },
-    orderBy: { projectDate: 'desc' },
+    orderBy: [{ orderIndex: 'desc' }, { projectDate: 'desc' }],
     select: {
       id: true,
       title: true,

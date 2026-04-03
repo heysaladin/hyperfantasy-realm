@@ -20,7 +20,7 @@ export default async function MitayaniPage() {
         { projectDate: { gte: new Date('2012-01-01') } },
       ],
     },
-    orderBy: { projectDate: 'desc' },
+    orderBy: [{ orderIndex: 'desc' }, { projectDate: 'desc' }],
     select: {
       id: true,
       title: true,

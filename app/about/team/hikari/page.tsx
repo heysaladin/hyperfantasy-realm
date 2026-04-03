@@ -20,7 +20,7 @@ export default async function HikariPage() {
         { projectDate: { gte: new Date('2013-01-01') } },
       ],
     },
-    orderBy: { projectDate: 'desc' },
+    orderBy: [{ orderIndex: 'desc' }, { projectDate: 'desc' }],
     select: {
       id: true,
       title: true,

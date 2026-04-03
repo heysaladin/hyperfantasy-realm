@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Dialog as RadixDialog } from 'radix-ui'
 import { ExternalLink, X } from 'lucide-react'
@@ -20,6 +20,99 @@ export type TeamPortfolio = {
   projectDate: string | null
   complexity: string | null
 }
+
+// ---------- masonry ----------
+
+const MASONRY_GAP = 32
+
+function useCols(): number {
+  const [cols, setCols] = useState(1)
+  useEffect(() => {
+    const update = () => setCols(window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+  return cols
+}
+
+function MasonryGrid({ items, gap, renderItem }: {
+  items: TeamPortfolio[]
+  gap: number
+  renderItem: (item: TeamPortfolio, index: number) => React.ReactNode
+}) {
+  const cols = useCols()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [positions, setPositions] = useState<{ x: number; y: number; w: number }[]>([])
+  const [containerH, setContainerH] = useState(0)
+
+  const compute = useCallback(() => {
+    const el = containerRef.current
+    if (!el || el.offsetWidth === 0) return
+    const totalW = el.offsetWidth
+    const colW = (totalW - gap * (cols - 1)) / cols
+    const colHeights = new Array(cols).fill(0)
+    const newPos = items.map((_, i) => {
+      const h = itemRefs.current[i]?.offsetHeight || 200
+      const col = colHeights.indexOf(Math.min(...colHeights))
+      const pos = { x: col * (colW + gap), y: colHeights[col], w: colW }
+      colHeights[col] += h + gap
+      return pos
+    })
+    setPositions(newPos)
+    setContainerH(Math.max(0, Math.max(0, ...colHeights) - gap))
+  }, [items, cols, gap])
+
+  useLayoutEffect(() => {
+    itemRefs.current = itemRefs.current.slice(0, items.length)
+    compute()
+  }, [items, cols]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const obs = new ResizeObserver(compute)
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [compute])
+
+  useEffect(() => {
+    const observers: ResizeObserver[] = []
+    itemRefs.current.forEach(el => {
+      if (!el) return
+      const obs = new ResizeObserver(compute)
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach(o => o.disconnect())
+  }, [items, compute])
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', height: containerH }}>
+      {items.map((item, i) => {
+        const pos = positions[i]
+        return (
+          <div
+            key={item.id}
+            ref={el => { itemRefs.current[i] = el }}
+            style={{
+              position: 'absolute',
+              left: pos?.x ?? 0,
+              top: pos?.y ?? 0,
+              width: pos?.w ?? '100%',
+              transition: 'top 0.25s ease, left 0.25s ease',
+            }}
+          >
+            {renderItem(item, i)}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ---------- main component ----------
 
 export function TeamPortfolioGrid({
   portfolios,
@@ -41,49 +134,49 @@ export function TeamPortfolioGrid({
   return (
     <>
       {/* ── Grid ── */}
-      <div className="columns-1 md:columns-2 lg:columns-3 gap-6">
-        {portfolios.map(p => (
-          <div key={p.id} className="break-inside-avoid mb-6">
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => setSelected(p)}
-              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(p) } }}
-              className="group block overflow-hidden rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-slate-300 dark:hover:border-white/20 transition cursor-pointer"
-            >
-              {p.imageUrl && (
-                <div className="overflow-hidden bg-slate-200 dark:bg-white/5">
-                  <img
-                    src={p.imageUrl}
-                    alt={p.title}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-auto block transition group-hover:scale-105"
-                  />
+      <MasonryGrid
+        items={portfolios}
+        gap={MASONRY_GAP}
+        renderItem={(p) => (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setSelected(p)}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(p) } }}
+            className="group relative overflow-hidden rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:border-slate-300 dark:hover:border-white/20 transition cursor-pointer"
+          >
+            {p.imageUrl && (
+              <div className="overflow-hidden bg-slate-200 dark:bg-white/5">
+                <img
+                  src={p.imageUrl}
+                  alt={p.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-auto block transition group-hover:scale-105"
+                />
+              </div>
+            )}
+            <div className="p-5">
+              {p.category && (
+                <p className="text-xs uppercase tracking-widest text-slate-400 dark:text-white/30 mb-1.5">{p.category}</p>
+              )}
+              <h3 className="text-base font-semibold leading-snug group-hover:text-slate-600 dark:group-hover:text-white/60 transition">{p.title}</h3>
+              {p.projectDate && (
+                <p className="text-xs text-slate-400 dark:text-white/30 mt-1.5">
+                  {new Date(p.projectDate).getFullYear()}
+                </p>
+              )}
+              {p.tags?.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {p.tags.slice(0, 3).map(t => (
+                    <span key={t} className="text-xs px-2 py-0.5 bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-white/50 rounded">{t}</span>
+                  ))}
                 </div>
               )}
-              <div className="p-5">
-                {p.category && (
-                  <p className="text-xs uppercase tracking-widest text-slate-400 dark:text-white/30 mb-1.5">{p.category}</p>
-                )}
-                <h3 className="text-base font-semibold leading-snug group-hover:text-slate-600 dark:group-hover:text-white/60 transition">{p.title}</h3>
-                {p.projectDate && (
-                  <p className="text-xs text-slate-400 dark:text-white/30 mt-1.5">
-                    {new Date(p.projectDate).getFullYear()}
-                  </p>
-                )}
-                {p.tags?.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {p.tags.slice(0, 3).map(t => (
-                      <span key={t} className="text-xs px-2 py-0.5 bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-white/50 rounded">{t}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
-        ))}
-      </div>
+        )}
+      />
 
       {/* ── Modal ── */}
       <RadixDialog.Root open={!!selected} onOpenChange={() => setSelected(null)}>

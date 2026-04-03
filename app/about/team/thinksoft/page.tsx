@@ -24,7 +24,7 @@ export default async function ThinksoftPage() {
         },
       ],
     },
-    orderBy: { projectDate: 'desc' },
+    orderBy: [{ orderIndex: 'desc' }, { projectDate: 'desc' }],
     select: {
       id: true,
       title: true,
