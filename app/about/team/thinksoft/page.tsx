@@ -16,7 +16,12 @@ export default async function ThinksoftPage() {
     where: {
       AND: [
         { OR: [{ isVisible: true }, { isVisible: null }] },
-        { category: 'Development' },
+        {
+          OR: [
+            { category: 'Development' },
+            { tags: { hasSome: ['Landing Page', 'Dashboard', 'Mobile App', 'Mobile', 'mobile'] } },
+          ],
+        },
       ],
     },
     orderBy: { projectDate: 'desc' },
