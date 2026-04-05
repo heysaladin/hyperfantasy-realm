@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Pencil, Trash2, Search, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react'
+import { Plus, Pencil, Trash2, Search, ArrowUpDown, ImageIcon } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { resolveContentAsText } from '@/lib/tiptap-content'
 import {
   AlertDialog,
@@ -31,21 +32,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'title-desc', label: 'Title Z→A' },
 ]
 
-type ColumnSort = { field: 'complexity' | 'visible' | 'featured'; dir: 'asc' | 'desc' } | null
-
-function sortPortfolios(list: any[], sort: SortOption, columnSort: ColumnSort): any[] {
-  if (columnSort) {
-    const { field, dir } = columnSort
-    const mult = dir === 'asc' ? 1 : -1
-    return [...list].sort((a, b) => {
-      switch (field) {
-        case 'complexity': return mult * (a.complexity ?? '').localeCompare(b.complexity ?? '')
-        case 'visible':    return mult * ((a.isVisible ? 1 : 0) - (b.isVisible ? 1 : 0))
-        case 'featured':   return mult * ((a.isFeatured ? 1 : 0) - (b.isFeatured ? 1 : 0))
-        default: return 0
-      }
-    })
-  }
+function sortPortfolios(list: any[], sort: SortOption): any[] {
   return [...list].sort((a, b) => {
     switch (sort) {
       case 'order-desc': return (b.orderIndex ?? 0) - (a.orderIndex ?? 0)
@@ -59,29 +46,6 @@ function sortPortfolios(list: any[], sort: SortOption, columnSort: ColumnSort): 
   })
 }
 
-function SortableColHeader({ label, field, columnSort, onToggle }: {
-  label: string
-  field: 'complexity' | 'visible' | 'featured'
-  columnSort: ColumnSort
-  onToggle: (f: 'complexity' | 'visible' | 'featured') => void
-}) {
-  const isActive = columnSort?.field === field
-  const isAsc = isActive && columnSort?.dir === 'asc'
-  const isDesc = isActive && columnSort?.dir === 'desc'
-  return (
-    <button
-      onClick={() => onToggle(field)}
-      className={`inline-flex items-center gap-1 font-semibold transition hover:text-slate-900 dark:hover:text-white ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-white/40'}`}
-    >
-      {label}
-      {isAsc
-        ? <ArrowUp size={12} aria-hidden="true" />
-        : isDesc
-          ? <ArrowDown size={12} aria-hidden="true" />
-          : <ArrowUpDown size={12} aria-hidden="true" className="opacity-40" />}
-    </button>
-  )
-}
 
 function getPageNumbers(current: number, total: number): (number | '...')[] {
   if (total <= 10) return Array.from({ length: total }, (_, i) => i + 1)
@@ -109,7 +73,6 @@ export default function AdminPortfoliosPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [jumpInput, setJumpInput] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('order-desc')
-  const [columnSort, setColumnSort] = useState<ColumnSort>(null)
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
@@ -125,15 +88,7 @@ export default function AdminPortfoliosPage() {
 
   const categories = Array.from(new Set(portfolios.map((p: any) => p.category).filter(Boolean))).sort()
 
-  const toggleColumnSort = (field: 'complexity' | 'visible' | 'featured') => {
-    setColumnSort(prev => {
-      if (prev?.field === field) return { field, dir: prev.dir === 'desc' ? 'asc' : 'desc' }
-      return { field, dir: 'desc' }
-    })
-    setCurrentPage(1)
-  }
-
-  const filtered = sortPortfolios(portfolios, sortBy, columnSort).filter((p: any) => {
+  const filtered = sortPortfolios(portfolios, sortBy).filter((p: any) => {
     if (categoryFilter !== 'all' && p.category !== categoryFilter) return false
     if (!search) return true
     const q = search.toLowerCase()
@@ -159,7 +114,6 @@ export default function AdminPortfoliosPage() {
 
   const handleSort = (value: string) => {
     setSortBy(value as SortOption)
-    setColumnSort(null)
     setCurrentPage(1)
   }
 
@@ -231,10 +185,10 @@ export default function AdminPortfoliosPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={columnSort ? '' : sortBy} onValueChange={handleSort}>
+        <Select value={sortBy} onValueChange={handleSort}>
           <SelectTrigger className="w-40 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10">
             <ArrowUpDown size={14} className="mr-1 text-slate-400 dark:text-white/40" aria-hidden="true" />
-            <SelectValue placeholder={columnSort ? 'Column sort' : undefined} />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {SORT_OPTIONS.map(opt => (
@@ -242,18 +196,6 @@ export default function AdminPortfoliosPage() {
             ))}
           </SelectContent>
         </Select>
-        {columnSort && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => { setColumnSort(null); setCurrentPage(1) }}
-            className="flex items-center gap-1.5 text-slate-500 dark:text-white/40"
-            title="Reset column sort"
-          >
-            <RotateCcw size={13} aria-hidden="true" />
-            Reset
-          </Button>
-        )}
         <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPage}>
           <SelectTrigger className="w-32 bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10">
             <SelectValue />
@@ -266,85 +208,65 @@ export default function AdminPortfoliosPage() {
         </Select>
       </div>
 
-      {/* Table */}
-      <div className="border border-slate-300 dark:border-white/10 rounded-lg overflow-hidden mb-6">
-        <table className="w-full">
-          <thead className="bg-slate-100 dark:bg-white/5 border-b border-slate-300 dark:border-white/10">
-            <tr>
-              <th className="text-left p-4 font-semibold">Title</th>
-              <th className="text-left p-4 font-semibold">Category</th>
-              <th className="text-left p-4 font-semibold">
-                <SortableColHeader label="Complexity" field="complexity" columnSort={columnSort} onToggle={toggleColumnSort} />
-              </th>
-              <th className="text-left p-4 font-semibold">
-                <SortableColHeader label="Publish" field="visible" columnSort={columnSort} onToggle={toggleColumnSort} />
-              </th>
-              <th className="text-left p-4 font-semibold">
-                <SortableColHeader label="Featured" field="featured" columnSort={columnSort} onToggle={toggleColumnSort} />
-              </th>
-              <th className="text-right p-4 font-semibold">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((portfolio: any) => (
-              <tr key={portfolio.id} className="border-b border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5">
-                <td className="p-4">
-                  <div>
-                    <div className="font-medium">{portfolio.title}</div>
-                    <div className="text-sm text-slate-600 dark:text-white/60 line-clamp-1">
-                      {resolveContentAsText(portfolio.description)}
-                    </div>
+      {/* Grid */}
+      {paginatedData.length === 0 ? (
+        <div className="py-16 text-center text-slate-500 dark:text-white/40 mb-6">
+          {search || categoryFilter !== 'all' ? 'No portfolios match your filters' : 'No portfolios found'}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+          {paginatedData.map((portfolio: any) => (
+            <div
+              key={portfolio.id}
+              className="group border border-slate-200 dark:border-white/10 rounded-lg overflow-hidden hover:border-slate-300 dark:hover:border-white/20 transition-colors"
+            >
+              {/* Image */}
+              <div className="relative aspect-video bg-slate-100 dark:bg-white/5">
+                {portfolio.imageUrl ? (
+                  <Image
+                    src={portfolio.imageUrl}
+                    alt={portfolio.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-slate-300 dark:text-white/10">
+                    <ImageIcon size={28} aria-hidden="true" />
                   </div>
-                </td>
-                <td className="p-4 text-slate-600 dark:text-white/60">{portfolio.category || '-'}</td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 text-xs rounded capitalize ${
-                    portfolio.complexity === 'short'
-                      ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400'
-                      : 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400'
-                  }`}>
-                    {portfolio.complexity || '-'}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 text-xs rounded ${
-                    portfolio.isVisible
-                      ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
-                      : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'
-                  }`}>
-                    {portfolio.isVisible ? 'Published' : 'Hidden'}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 text-xs rounded ${
-                    portfolio.isFeatured
-                      ? 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400'
-                      : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/30'
-                  }`}>
-                    {portfolio.isFeatured ? 'Featured' : '—'}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <div className="flex gap-2 justify-end">
-                    <Link href={`/admin/portfolios/${portfolio.id}/edit`}>
-                      <Button variant="outline" size="sm"><Pencil size={16} /></Button>
-                    </Link>
-                    <Button variant="outline" size="sm" onClick={() => setDeleteId(portfolio.id)}>
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                )}
+                {/* Status badges overlay */}
+                <div className="absolute top-1.5 left-1.5 flex gap-1">
+                  {!portfolio.isVisible && (
+                    <span className="px-1.5 py-0.5 text-[10px] rounded bg-red-500/80 text-white font-medium">Hidden</span>
+                  )}
+                  {portfolio.isFeatured && (
+                    <span className="px-1.5 py-0.5 text-[10px] rounded bg-yellow-500/80 text-white font-medium">Featured</span>
+                  )}
+                </div>
+              </div>
 
-        {paginatedData.length === 0 && (
-          <div className="p-8 text-center text-slate-500 dark:text-white/40">
-            {search || categoryFilter !== 'all' ? 'No portfolios match your filters' : 'No portfolios found'}
-          </div>
-        )}
-      </div>
+              {/* Info + actions */}
+              <div className="p-3 flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-medium text-sm truncate">{portfolio.title}</p>
+                  <p className="text-xs text-slate-400 dark:text-white/40 truncate">{portfolio.category || '—'}</p>
+                </div>
+                <div className="flex gap-1 shrink-0">
+                  <Link href={`/admin/portfolios/${portfolio.id}/edit`}>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Pencil size={14} aria-hidden="true" />
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:text-red-500 dark:hover:text-red-400" onClick={() => setDeleteId(portfolio.id)}>
+                    <Trash2 size={14} aria-hidden="true" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (

@@ -8,8 +8,18 @@ import { Label } from '@/components/ui/label'
 import dynamic from 'next/dynamic'
 const TiptapEditor = dynamic(() => import('@/components/tiptap-editor').then(m => ({ default: m.TiptapEditor })), { ssr: false, loading: () => <div className="h-64 rounded-md border border-slate-200 dark:border-white/30 bg-white/5 animate-pulse" /> })
 import { Checkbox } from '@/components/ui/checkbox'
-import { ArrowLeft, X } from 'lucide-react'
+import { ArrowLeft, X, Wand2 } from 'lucide-react'
 import Link from 'next/link'
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
 
 export default function EditBlogPage({
   params
@@ -130,14 +140,24 @@ export default function EditBlogPage({
         {/* Slug */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="slug">Slug *</Label>
-          <Input
-            id="slug"
-            required
-            value={formData.slug}
-            onChange={(e) => setFormData({...formData, slug: e.target.value})}
-            className="bg-slate-50 dark:bg-white/5"
-            placeholder="url-friendly-title"
-          />
+          <div className="flex gap-2">
+            <Input
+              id="slug"
+              required
+              value={formData.slug}
+              onChange={(e) => setFormData({...formData, slug: e.target.value})}
+              className="bg-slate-50 dark:bg-white/5"
+              placeholder="url-friendly-title"
+            />
+            <button
+              type="button"
+              onClick={() => setFormData(f => ({ ...f, slug: slugify(f.title) }))}
+              title="Generate slug from title"
+              className="shrink-0 px-3 rounded-md border border-input bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+            >
+              <Wand2 size={16} aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
         {/* Excerpt */}
