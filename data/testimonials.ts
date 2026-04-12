@@ -103,7 +103,7 @@ export const testimonials: Testimonial[] = [
     company: "Tamawal®",
     image: "https://randomuser.me/api/portraits/men/68.jpg",
     content:
-      "I have worked with Salah for more than one year. He always provides useful UI/UX solutions based on a deep understanding of the problems he works on. I was very lucky to collaborate with him on many product solutions, where he delivered outstanding results.",
+      "I have worked with Hyperfantasy for more than one year. He always provides useful UI/UX solutions based on a deep understanding of the problems he works on. I was very lucky to collaborate with him on many product solutions, where he delivered outstanding results.",
     rating: 4.5,
     nps: 9,
     date: "2026-03-02",
