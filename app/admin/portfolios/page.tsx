@@ -21,7 +21,7 @@ import {
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50]
 
-type SortOption = 'order-desc' | 'order-asc' | 'date-desc' | 'date-asc' | 'title-asc' | 'title-desc'
+type SortOption = 'order-desc' | 'order-asc' | 'date-desc' | 'date-asc' | 'title-asc' | 'title-desc' | 'visible-desc' | 'visible-asc'
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'order-desc', label: 'Order ↓' },
@@ -30,17 +30,21 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'date-asc', label: 'Date ↑' },
   { value: 'title-asc', label: 'Title A→Z' },
   { value: 'title-desc', label: 'Title Z→A' },
+  { value: 'visible-desc', label: 'Visible First' },
+  { value: 'visible-asc', label: 'Hidden First' },
 ]
 
 function sortPortfolios(list: any[], sort: SortOption): any[] {
   return [...list].sort((a, b) => {
     switch (sort) {
-      case 'order-desc': return (b.orderIndex ?? 0) - (a.orderIndex ?? 0)
-      case 'order-asc':  return (a.orderIndex ?? 0) - (b.orderIndex ?? 0)
-      case 'date-desc':  return new Date(b.projectDate ?? 0).getTime() - new Date(a.projectDate ?? 0).getTime()
-      case 'date-asc':   return new Date(a.projectDate ?? 0).getTime() - new Date(b.projectDate ?? 0).getTime()
-      case 'title-asc':  return (a.title ?? '').localeCompare(b.title ?? '')
-      case 'title-desc': return (b.title ?? '').localeCompare(a.title ?? '')
+      case 'order-desc':   return (b.orderIndex ?? 0) - (a.orderIndex ?? 0)
+      case 'order-asc':    return (a.orderIndex ?? 0) - (b.orderIndex ?? 0)
+      case 'date-desc':    return new Date(b.projectDate ?? 0).getTime() - new Date(a.projectDate ?? 0).getTime()
+      case 'date-asc':     return new Date(a.projectDate ?? 0).getTime() - new Date(b.projectDate ?? 0).getTime()
+      case 'title-asc':    return (a.title ?? '').localeCompare(b.title ?? '')
+      case 'title-desc':   return (b.title ?? '').localeCompare(a.title ?? '')
+      case 'visible-desc': return (b.isVisible ? 1 : 0) - (a.isVisible ? 1 : 0)
+      case 'visible-asc':  return (a.isVisible ? 1 : 0) - (b.isVisible ? 1 : 0)
       default: return 0
     }
   })

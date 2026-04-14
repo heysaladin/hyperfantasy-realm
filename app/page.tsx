@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { ArrowRight, Mail, Star, Monitor, Smile, ImageIcon, Box, Printer, Gem, Globe, Smartphone, PlayCircle } from 'lucide-react'
+import { ArrowRight, Mail, Star, Monitor, Smile, ImageIcon, Printer, Gem, Globe, Smartphone } from 'lucide-react'
 import { EnquiryCTAButton } from '@/components/enquiry-cta-button'
 import { testimonials } from '@/data/testimonials'
 import { resolveContentAsText } from '@/lib/tiptap-content'
@@ -32,12 +32,10 @@ const SERVICES = [
   { icon: Monitor,    label: 'UI Design'       },
   { icon: Smile,      label: 'UX Design'       },
   { icon: ImageIcon,  label: 'Illustration'    },
-  { icon: Box,        label: '3D Design'       },
   { icon: Printer,    label: 'Graphic Design'  },
   { icon: Gem,        label: 'Brand Identity'  },
   { icon: Globe,      label: 'Web Dev.'         },
   { icon: Smartphone, label: 'Mobile App Dev.' },
-  { icon: PlayCircle, label: 'Micro Motion'    },
 ]
 
 const CLIENTS = [
