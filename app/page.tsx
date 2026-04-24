@@ -235,14 +235,14 @@ export default async function Home() {
         </section>
 
         {/* ── CLIENTS ──────────────────────────────────────────── */}
-        <section className="py-20 px-6 lg:px-8 border-t border-black/10 dark:border-white/5">
+        <section className="py-20 px-6 lg:px-8 border-t border-black/10 dark:border-white/5 bg-slate-500 dark:bg-transparent">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16">
               {CLIENTS.map(({ name, logo }) => (
-                <div key={name} className="flex items-center justify-center" style={{ height: 56 }}>
-                  <Image src={logo} alt={name} width={160} height={56}
-                    className="object-contain dark:invert dark:opacity-60 opacity-60 hover:opacity-100 dark:hover:opacity-90 transition-opacity"
-                    style={{ maxWidth: 160, height: 'auto' }}
+                <div key={name} className="flex items-center justify-center" style={{ height: 48 }}>
+                  <Image src={logo} alt={name} width={200} height={48}
+                    className="opacity-60 hover:opacity-100 transition-opacity"
+                    style={{ width: 'auto', height: '100%', maxWidth: 140, objectFit: 'contain' }}
                   />
                 </div>
               ))}
@@ -264,7 +264,7 @@ export default async function Home() {
             <div className="pointer-events-none absolute inset-y-0 right-0 w-24 z-10 hf-fade-r" />
             <div className="marquee-track">
               {[...testimonials, ...testimonials].map((t, i) => (
-                <div key={i} className="hf-card border border-black/10 dark:border-white/10 rounded-2xl p-8 shrink-0"
+                <div key={i} className="hf-card border border-black/10 dark:border-white/10 rounded-2xl p-8 shrink-0 flex flex-col"
                   style={{ width: 380 }}
                 >
                   <div className="flex gap-0.5 mb-5" role="img" aria-label={`Rating: ${t.rating} out of 5 stars`}>
@@ -272,11 +272,11 @@ export default async function Home() {
                       <Star key={j} size={14} className="fill-yellow-400 text-yellow-400" aria-hidden="true" />
                     ))}
                   </div>
-                  <p style={{ fontSize: 16, fontWeight: 400, lineHeight: '160%' }}
-                    className="dark:text-white/70 text-slate-700 mb-6">
+                  <p style={{ fontSize: t.content.length < 120 ? 24 : t.content.length < 200 ? 20 : 16, fontWeight: 400, lineHeight: '160%' }}
+                    className="dark:text-white/70 text-slate-700 mb-6 grow">
                     &ldquo;{t.content}&rdquo;
                   </p>
-                  <div className="flex items-center gap-3 pt-4 border-t border-black/10 dark:border-white/10">
+                  <div className="flex items-center gap-3 pt-4 border-t border-black/10 dark:border-white/10 mt-auto">
                     {t.image && (
                       <Image src={t.image} alt={t.name} width={48} height={48} className="rounded-2xl object-cover shrink-0" />
                     )}

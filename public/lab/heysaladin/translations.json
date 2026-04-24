@@ -1,0 +1,32 @@
+{
+  "en": {
+    "bio": "Hey, I'm Saladin, a designer from Indonesia. I research problems, design interactions, and write code — bringing a human-centered approach and an artistic eye to digital products that are both usable and genuinely beautiful.",
+    "send_email": "Send email",
+    "chat_now": "Chat now",
+    "working_experiences": "Working Experiences",
+    "testimonials_count": "20+ testimonials",
+    "testimonials_title": "Testimonials",
+    "testimonials_subtitle": "20+ reviews from clients & colleagues",
+    "now": "now"
+  },
+  "id": {
+    "bio": "Hei, saya Saladin, seorang desainer dari Indonesia. Saya meneliti masalah, merancang interaksi, dan menulis kode — membawa pendekatan berpusat pada manusia dan kepekaan artistik untuk menciptakan produk digital yang fungsional sekaligus indah.",
+    "send_email": "Kirim email",
+    "chat_now": "Hubungi sekarang",
+    "working_experiences": "Pengalaman Kerja",
+    "testimonials_count": "20+ testimoni",
+    "testimonials_title": "Testimoni",
+    "testimonials_subtitle": "20+ ulasan dari klien & rekan kerja",
+    "now": "sekarang"
+  },
+  "ar": {
+    "bio": "مرحباً، أنا صلاح الدين، مصمم من إندونيسيا. أبحث في المشكلات، وأصمم التفاعلات، وأكتب الكود — بنهج يركز على الإنسان وحس فني لبناء منتجات رقمية تجمع بين الفائدة والجمال الحقيقي.",
+    "send_email": "أرسل بريداً",
+    "chat_now": "تحدث الآن",
+    "working_experiences": "الخبرات العملية",
+    "testimonials_count": "20+ توصية",
+    "testimonials_title": "التوصيات",
+    "testimonials_subtitle": "أكثر من 20 تقييماً من عملاء وزملاء",
+    "now": "الآن"
+  }
+}

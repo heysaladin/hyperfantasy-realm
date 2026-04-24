@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HeySaladin — Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#bbc3ff",
+                        "surface-dim": "#dadada",
+                        "background": "#f9f9f9",
+                        "on-primary-fixed-variant": "#1731c2",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f9f9f9",
+                        "on-primary-container": "#fffbff",
+                        "primary": "#354bd7",
+                        "on-primary-fixed": "#000d5f",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#dde3ef",
+                        "on-background": "#1a1c1c",
+                        "tertiary-fixed": "#ffdbc7",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed-dim": "#ffb687",
+                        "surface-container-high": "#e8e8e8",
+                        "on-surface-variant": "#444655",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "surface": "#f9f9f9",
+                        "primary-container": "#5166f1",
+                        "surface-tint": "#384ed9",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary-container": "#5f656f",
+                        "secondary-container": "#dde3ef",
+                        "on-surface": "#1a1c1c",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#414751",
+                        "inverse-on-surface": "#f0f1f1",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#b85a00",
+                        "surface-container": "#eeeeee",
+                        "tertiary": "#934700",
+                        "outline-variant": "#c5c5d7",
+                        "secondary": "#595f69",
+                        "primary-fixed": "#dfe0ff",
+                        "on-secondary-fixed": "#161c24",
+                        "on-tertiary-fixed": "#311300",
+                        "surface-container-low": "#f3f3f3",
+                        "primary-fixed-dim": "#bbc3ff",
+                        "on-tertiary-fixed-variant": "#733600",
+                        "outline": "#757686",
+                        "secondary-fixed-dim": "#c1c7d2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        body {
+            background-color: #f9f9f9;
+            color: #1a1c1c;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .sticky-column {
+            height: calc(100vh - 4rem);
+            top: 2rem;
+        }
+        /* Language dropdown */
+        .lang-option {
+            display: flex; align-items: center; gap: 8px;
+            width: 100%; padding: 9px 14px; font-size: 12px; font-weight: 500;
+            color: rgb(39,45,54); background: none; border: none; cursor: pointer;
+            text-align: left; transition: background .1s; font-family: inherit;
+        }
+        .lang-option:hover { background: rgb(245,245,247); }
+        .lang-option.active { font-weight: 600; }
+        .lang-code { opacity: .45; font-size: 10px; min-width: 18px; }
+        /* Testimonials modal */
+        #testimonials-modal {
+            display: none; position: fixed; inset: 0; z-index: 200;
+            align-items: center; justify-content: center;
+        }
+        #testimonials-modal.open { display: flex; }
+        #testimonials-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+        #testimonials-panel {
+            position: relative; background: #fff; border-radius: 20px;
+            width: min(740px, calc(100vw - 40px));
+            max-height: calc(100vh - 72px);
+            overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
+        }
+        #testimonials-header {
+            padding: 20px 24px 16px; border-bottom: 1px solid rgb(232,232,234);
+            display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+        }
+        #testimonials-grid-wrap { overflow-y: auto; padding: 20px 24px 24px; }
+        #testimonials-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+        }
+        @media (max-width: 540px) { #testimonials-grid { grid-template-columns: 1fr; } }
+        .t-card {
+            background: rgb(248,248,250); border-radius: 14px;
+            padding: 15px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .t-stars { display: flex; gap: 2px; }
+        .t-close-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 50%; background: rgb(240,240,242);
+            border: none; cursor: pointer; transition: background .15s;
+        }
+        .t-close-btn:hover { background: rgb(228,228,230); }
+        /* Rotating dot grid icon */
+        @keyframes dot-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        /* Portfolio link hover label */
+        .portfolio-link { display: inline-flex; align-items: center; gap: 5px; color: #4B5563; text-decoration: none; }
+        .portfolio-label {
+            font-size: 12px; font-weight: 500; color: rgb(134,139,145);
+            opacity: 0; max-width: 0; overflow: hidden; white-space: nowrap;
+            transition: opacity 0.25s ease, max-width 0.3s ease;
+        }
+        @media (hover: hover) {
+            .portfolio-link:hover .portfolio-label { opacity: 1; max-width: 90px; }
+        }
+        @media (max-width: 767px) { .portfolio-label { display: none; } }
+        /* Main button hover orange */
+        .btn-email:hover { background: #F97316 !important; }
+        /* Theme toggle */
+        .theme-toggle {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 999px;
+            border: 1px solid rgb(230,230,232); background: transparent;
+            cursor: pointer; transition: border-color .15s, background .15s;
+            color: rgb(134,139,145); flex-shrink: 0;
+        }
+        .theme-toggle:hover { background: rgb(243,243,245); }
+        /* Social icons row */
+        .social-icons-row { color: rgb(160,165,175); }
+        /* ── Dark mode ───────────────────────────────────────────────── */
+        html.dark body { background-color: #111113 !important; color: #e2e2e2 !important; }
+        html.dark #bio-text { color: #b4bbc8 !important; }
+        html.dark .btn-email { background: #e2e4e8 !important; color: #111113 !important; }
+        html.dark .btn-email:hover { background: #F97316 !important; color: #fff !important; }
+        html.dark #btn-chat-link { background: rgb(26,28,38) !important; color: rgb(190,196,212) !important; }
+        html.dark #btn-chat-link svg path { fill: rgb(120,126,150) !important; }
+        html.dark #exp-title { color: rgb(190,196,212) !important; }
+        html.dark #exp-rows span { color: rgb(190,196,212) !important; }
+        html.dark #now-badge { background: rgb(36,40,54) !important; color: rgb(130,138,162) !important; }
+        html.dark .border-surface-container-highest\/50 { border-color: rgba(55,58,74,0.7) !important; }
+        html.dark #lang-btn { border-color: rgb(48,50,64) !important; color: rgb(96,102,122) !important; }
+        html.dark #lang-dropdown { background: #1a1c26 !important; border-color: rgb(46,48,62) !important; }
+        html.dark .lang-option { color: rgb(190,196,212) !important; }
+        html.dark .lang-option:hover { background: rgb(28,30,42) !important; }
+        html.dark #clock { color: rgb(86,92,112) !important; }
+        html.dark #testimonials-label { color: rgb(86,92,112) !important; }
+        html.dark .portfolio-link { color: rgb(86,92,112) !important; }
+        html.dark .portfolio-label { color: rgb(86,92,112) !important; }
+        html.dark #testimonial-avatars img { border-color: #111113 !important; }
+        html.dark .cta-box { background: #18191f !important; }
+        html.dark .cta-secondary { border-color: rgb(46,50,66) !important; color: rgb(140,148,170) !important; }
+        html.dark .cta-copyright { color: rgb(66,72,94) !important; }
+        html.dark .social-icons-row { color: rgb(56,62,80) !important; }
+        html.dark .marquee-wrapper { mask-image: linear-gradient(to right, rgba(0,0,0,0) 1%, rgb(0,0,0) 15%, rgb(0,0,0) 85%, rgba(0,0,0,0) 99%); -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 1%, rgb(0,0,0) 15%, rgb(0,0,0) 85%, rgba(0,0,0,0) 99%); }
+        html.dark #testimonials-panel { background: #1a1c26 !important; }
+        html.dark #testimonials-header { border-bottom-color: rgb(36,38,54) !important; }
+        html.dark #modal-title { color: rgb(210,216,230) !important; }
+        html.dark #modal-subtitle { color: rgb(86,92,112) !important; }
+        html.dark .t-card { background: rgb(20,22,34) !important; }
+        html.dark .t-card > p { color: rgb(158,166,186) !important; }
+        html.dark .t-close-btn { background: rgb(30,32,46) !important; }
+        html.dark .t-close-btn:hover { background: rgb(40,42,58) !important; }
+        html.dark .t-close-btn path { stroke: rgb(140,148,170) !important; }
+        html.dark .theme-toggle { border-color: rgb(48,50,64) !important; }
+        html.dark .theme-toggle:hover { background: rgb(24,26,38) !important; }
+        html.dark .testimonials-name { color: rgb(195,200,218) !important; }
+        html.dark .testimonials-meta { color: rgb(86,92,112) !important; }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<div class="max-w-[1440px] mx-auto flex flex-col md:flex-row min-h-screen px-4 md:px-[36px] pt-[24px] pb-[36px] gap-12 md:gap-24">
+<!-- Left Column: Sticky Sidebar -->
+<aside class="w-full md:w-[380px] flex flex-col md:sticky md:top-6 md:h-[calc(100vh-3rem)]">
+<!-- Top row: avatar + clock + clock icon -->
+<div class="flex items-center justify-between mb-9">
+<div class="w-8 h-8 overflow-hidden bg-surface-container-highest flex-shrink-0" style="border-radius:50%">
+<img alt="Saladin profile avatar" class="w-full h-full object-cover" style="border-radius:50%" src="https://heyheysaladin.web.app/assets/images/profile.jpg"/>
+</div>
+<div class="flex items-center gap-2">
+<span id="clock" style="font-size:13px;color:rgb(134,139,145);white-space:nowrap;letter-spacing:-0.01em;"></span>
+<button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+  <svg id="theme-icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg id="theme-icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+<div class="relative" id="lang-switcher">
+  <button id="lang-btn" onclick="toggleLangDropdown()" style="display:inline-flex;align-items:center;gap:3px;background:transparent;padding:4px 7px 4px 9px;font-size:11px;font-weight:500;color:rgb(134,139,145);letter-spacing:0.04em;cursor:pointer;border:1px solid rgb(230,230,232);border-radius:999px;outline:none;font-family:inherit;">
+    <span id="lang-label">EN</span>
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;opacity:.6"><path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="lang-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid rgb(230,230,232);border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.04);overflow:hidden;min-width:184px;z-index:50;">
+    <button class="lang-option" data-lang="en" onclick="setLang('en')"><span class="lang-code">EN</span> English</button>
+    <button class="lang-option" data-lang="id" onclick="setLang('id')"><span class="lang-code">ID</span> Bahasa Indonesia</button>
+    <button class="lang-option" data-lang="ar" onclick="setLang('ar')"><span class="lang-code">AR</span> العربية</button>
+  </div>
+</div>
+</div>
+</div>
+<!-- Bio -->
+<p id="bio-text" class="max-w-[340px] mb-8" style="font-size:15px;font-weight:400;letter-spacing:-0.2px;line-height:24px;color:#272d36;">Hey, I'm Saladin, a designer from Indonesia. I research problems, design interactions, and write code — bringing a human-centered approach and an artistic eye to digital products that are both usable and genuinely beautiful.</p>
+<!-- Action Buttons -->
+<div class="flex gap-3 mb-8">
+<a href="mailto:heysaladin@gmail.com" id="btn-email-link" class="btn-email" style="background:#1a1c1c;letter-spacing:-0.16px;border-radius:999px;color:#fff;font-size:14px;font-weight:600;padding:8px 12px 8px 18px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;transition:background .2s;">
+  <span id="btn-email-text">Send email</span>
+  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 2.5L9.5 6.5L4.5 10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+<a href="https://wa.me/6285648984911" target="_blank" rel="noopener" id="btn-chat-link" style="background:rgb(236,236,238);border-radius:999px;font-size:14px;font-weight:500;letter-spacing:-0.18px;padding:8px 16px 8px 12px;display:inline-flex;align-items:center;gap:7px;color:#1a1c1c;text-decoration:none;transition:background .15s;">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="#4B5563" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.94 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.372-.025-.521-.074-.149-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.999-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <span id="btn-chat-text">Chat now</span>
+</a>
+</div>
+<!-- Working Experiences -->
+<div class="mb-8">
+<h3 id="exp-title" class="text-sm font-medium mb-4" style="color:rgb(39,45,54)">Working Experiences</h3>
+<div id="exp-rows">
+<div class="flex justify-between items-center text-sm border-b border-surface-container-highest/50 pt-[7px] pb-[7px]">
+<span style="color:rgb(39,45,54)">Fintech, Riyadh KSA</span>
+<div class="flex items-center gap-2">
+  <span style="color:rgb(39,45,54);opacity:.5">Product / 2022</span>
+  <span id="now-badge" style="background:rgb(232,232,234);color:rgb(80,86,96);border-radius:999px;font-size:10px;font-weight:500;padding:1px 7px;line-height:1.6;">now</span>
+</div>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-surface-container-highest/50 pt-[7px] pb-[7px]">
+<span style="color:rgb(39,45,54)">Tokopedia</span>
+<span style="color:rgb(39,45,54);opacity:.5">Product Design Trainee / 2021</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-surface-container-highest/50 pt-[7px] pb-[7px]">
+<span style="color:rgb(39,45,54)">Karma Group</span>
+<span style="color:rgb(39,45,54);opacity:.5">Software Developer / 2018 – 2020</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-surface-container-highest/50 pt-[7px] pb-[7px]">
+<span style="color:rgb(39,45,54)">Pinjam</span>
+<span style="color:rgb(39,45,54);opacity:.5">Frontend Engineer / 2017</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-surface-container-highest/50 pt-[7px] pb-[7px]">
+<span style="color:rgb(39,45,54)">Trio</span>
+<span style="color:rgb(39,45,54);opacity:.5">Graphic &amp; Web Designer / 2013 – 2015</span>
+</div>
+<div class="flex justify-between items-center text-sm border-b border-surface-container-highest/50 pt-[7px] pb-[7px]">
+<span style="color:rgb(39,45,54)">Jade</span>
+<span style="color:rgb(39,45,54);opacity:.5">Graphic Designer / 2012</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span style="color:rgb(39,45,54)">GarudaMedia</span>
+<span style="color:rgb(39,45,54);opacity:.5">Illustrator &amp; 2D Animator / 2012</span>
+</div>
+</div>
+</div>
+<!-- Client Logo Strip -->
+<style>
+  .marquee-wrapper {
+    width: 100%;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, rgba(0,0,0,0) 1%, rgb(0,0,0) 15%, rgb(0,0,0) 85%, rgba(0,0,0,0) 99%);
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 1%, rgb(0,0,0) 15%, rgb(0,0,0) 85%, rgba(0,0,0,0) 99%);
+    padding: 14px 0;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 48px;
+    width: max-content;
+    animation: marquee linear infinite;
+    animation-play-state: paused;
+    align-items: center;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .marquee-track.ready { animation-play-state: running; }
+  .marquee-wrapper:hover .marquee-track { animation-play-state: paused !important; }
+  .marquee-track img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    display: block;
+  }
+  @keyframes marquee {
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+</style>
+<div class="marquee-wrapper mb-8">
+  <div class="marquee-track" id="track"></div>
+</div>
+<script>
+  const logos = [
+    { src: "./logo/logo-05.svg", alt: "Logo 5" },
+    { src: "./logo/logo-04.svg", alt: "Logo 4" },
+    { src: "./logo/logo-01.svg", alt: "Logo 1" },
+    { src: "./logo/logo-02.svg", alt: "Logo 2" },
+    { src: "./logo/logo-03.png", alt: "Logo 3" },
+    { src: "./logo/logo-06.svg", alt: "Logo 6" },
+    { src: "./logo/logo-07.png", alt: "Logo 7" },
+  ];
+  const track = document.getElementById('track');
+  const allLogos = [...logos, ...logos];
+  let loaded = 0;
+  const onLoad = () => {
+    loaded++;
+    if (loaded === allLogos.length) {
+      // Measure actual rendered half-width and derive duration from constant speed
+      const halfWidth = track.scrollWidth / 2;
+      const speed = 30; // px per second — consistent regardless of logo count/size
+      track.style.animationDuration = (halfWidth / speed) + 's';
+      track.classList.add('ready');
+    }
+  };
+  allLogos.forEach(({ src, alt }) => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt;
+    img.onload = onLoad;
+    img.onerror = onLoad;
+    track.appendChild(img);
+  });
+</script>
+<!-- Bottom: testimonials + globe -->
+<div class="mt-auto flex justify-between items-center pt-2">
+<button onclick="openTestimonialsModal()" style="display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;padding:0;font-family:inherit;">
+  <div id="testimonial-avatars" style="display:flex;"></div>
+  <span id="testimonials-label" style="font-size:13px;color:rgb(134,139,145);">20+ testimonials</span>
+</button>
+<a href="https://hyperfantasy-projects.vercel.app/projects" target="_blank" rel="noopener" class="portfolio-link">
+  <span class="portfolio-label">all portfolios</span>
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:#4B5563;animation:dot-spin 6s linear infinite;display:block;flex-shrink:0;">
+    <circle cx="12" cy="5" r="3">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.6s" repeatCount="indefinite" begin="0s"/>
+    </circle>
+    <circle cx="19" cy="17" r="3">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.6s" repeatCount="indefinite" begin="0.53s"/>
+    </circle>
+    <circle cx="5" cy="17" r="3">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.6s" repeatCount="indefinite" begin="1.06s"/>
+    </circle>
+  </svg>
+</a>
+</div>
+<script>
+  (function() {
+    function updateClock() {
+      // Always show WIB (UTC+7) regardless of viewer's timezone
+      const utcMs = Date.now() + new Date().getTimezoneOffset() * 60000;
+      const wib = new Date(utcMs + 7 * 3600000);
+      const h = wib.getHours(), m = wib.getMinutes(), s = wib.getSeconds();
+      const ampm = h >= 12 ? 'pm' : 'am';
+      const hh = (h % 12 || 12).toString().padStart(2,'0');
+      const mm = m.toString().padStart(2,'0');
+      const ss = s.toString().padStart(2,'0');
+      const el = document.getElementById('clock');
+      if (el) el.textContent = `${hh}:${mm}:${ss} ${ampm} wib`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+  })();
+</script>
+</aside>
+<!-- Right Column: Main Content -->
+<main class="flex-1 flex flex-col gap-3">
+<!-- First box: hero image -->
+<div class="w-full rounded-[8px] overflow-hidden aspect-[4/3]">
+  <img src="./pictures/profile-01.jpg" alt="Saladin hero" class="w-full h-full object-cover"/>
+</div>
+<!-- Project 1: Dark UI -->
+<div class="w-full bg-[#1c1c1c] rounded-[8px] overflow-hidden">
+<div class="w-full rounded-[8px] overflow-hidden bg-black/20">
+<img alt="Financial Analytics Dashboard" class="w-full h-full object-cover" src="https://cdn.dribbble.com/userupload/3223425/file/original-e4ec2c93d78160d853ff4f41d0bb60c2.png"/>
+</div>
+</div>
+<!-- Project 2: Component System -->
+<div class="w-full bg-[#1c1c1c] rounded-[8px] overflow-hidden">
+<div class="w-full rounded-[8px] overflow-hidden bg-black/20">
+<img alt="Trading Platform UI Components" class="w-full h-full object-cover" src="https://cdn.dribbble.com/userupload/2582828/file/original-0f841afee9aae886bf5727f7f9fc2cb2.png"/>
+</div>
+</div>
+<!-- Project 3: Wide Branding -->
+<div class="w-full bg-[#1c1c1c] rounded-[8px] overflow-hidden">
+<div class="w-full rounded-[8px] overflow-hidden bg-black/20">
+<img alt="Brand Identity Guidelines" class="w-full h-full object-cover" src="https://cdn.dribbble.com/users/8414462/screenshots/16336374/media/dcf4d86fdc362093e288b84138c6aaec.jpg?compress=1&resize=1200x900&vertical=top"/>
+</div>
+</div>
+<!-- Project 4: Component System -->
+<div class="w-full bg-[#1c1c1c] rounded-[8px] overflow-hidden">
+<div class="w-full rounded-[8px] overflow-hidden bg-black/20">
+<img alt="Trading Platform UI Components" class="w-full h-full object-cover" src="https://cdn.dribbble.com/userupload/10029229/file/original-38d08e65a93bee5cf670d621acfcb290.png?resize=2048x1536&vertical=center"/>
+</div>
+</div>
+<!-- Project 5: Component System -->
+<div class="w-full bg-[#1c1c1c] rounded-[8px] overflow-hidden">
+<div class="w-full rounded-[8px] overflow-hidden bg-black/20">
+<img alt="Trading Platform UI Components" class="w-full h-full object-cover" src="https://cdn.dribbble.com/userupload/4394995/file/original-76bb747005b619a94a3e30f5b7d20a11.png"/>
+</div>
+</div>
+<!-- Project 6: Wide Branding -->
+<div class="w-full bg-[#1c1c1c] rounded-[8px] overflow-hidden">
+<div class="w-full rounded-[8px] overflow-hidden bg-black/20">
+<img alt="Brand Identity Guidelines" class="w-full h-full object-cover" src="https://cdn.dribbble.com/userupload/4029144/file/original-4218bf4ee17eb0d1e2b2ed9041ff85c3.png"/>
+</div>
+</div>
+<!-- Last box: CTA -->
+<div class="cta-box w-full rounded-[8px] bg-[#f4f4f5] aspect-[4/3] flex flex-col items-center px-8 py-8">
+  <!-- Button group: fills available space, centers buttons -->
+  <div style="flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;margin-bottom:32px;">
+    <a href="mailto:heysaladin@gmail.com" class="btn-email" style="display:inline-flex;align-items:center;gap:16px;background:#1a1c1c;color:#fff;border-radius:999px;font-size:22px;font-weight:700;padding:18px 36px 18px 48px;text-decoration:none;letter-spacing:-0.4px;transition:background .2s;">
+      Send email
+      <svg width="18" height="18" viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L9.5 6.5L4.5 10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="https://hyperfantasy-projects.vercel.app/projects" target="_blank" rel="noopener" class="cta-secondary" style="display:inline-flex;align-items:center;gap:6px;background:transparent;color:rgb(80,86,96);border:1px solid rgb(210,212,216);border-radius:999px;font-size:14px;font-weight:500;padding:10px 24px;text-decoration:none;transition:border-color .2s,color .2s;">
+      See all portfolios
+    </a>
+  </div>
+  <!-- Social icons -->
+  <div class="social-icons-row" style="display:flex;align-items:center;justify-content:center;gap:16px;width:100%;">
+    <!-- Dribbble -->
+    <a href="https://dribbble.com" target="_blank" rel="noopener" style="color:inherit;transition:color .15s;" onmouseover="iconIn(this)" onmouseout="iconOut(this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="Dribbble"><path d="M12 0c-6.628 0-12 5.373-12 12s5.372 12 12 12 12-5.373 12-12-5.372-12-12-12zm9.885 11.441c-2.575-.422-4.943-.445-7.103-.073-.244-.563-.497-1.125-.767-1.68 2.31-1 4.165-2.358 5.548-4.082 1.35 1.594 2.197 3.619 2.322 5.835zm-3.842-7.282c-1.205 1.554-2.868 2.783-4.986 3.68-1.016-1.861-2.178-3.676-3.488-5.438.779-.197 1.591-.314 2.431-.314 2.275 0 4.368.779 6.043 2.072zm-10.516-.993c1.331 1.742 2.511 3.538 3.537 5.381-2.43.715-5.331 1.082-8.684 1.105.692-2.835 2.601-5.193 5.147-6.486zm-5.44 8.834l.013-.256c3.849-.005 7.169-.448 9.95-1.322.233.475.456.952.67 1.432-3.38 1.057-6.165 3.222-8.337 6.48-1.432-1.719-2.296-3.927-2.296-6.334zm3.829 7.81c1.969-3.088 4.482-5.098 7.598-6.027.928 2.42 1.609 4.91 2.043 7.46-3.349 1.291-6.953.666-9.641-1.433zm11.586.43c-.438-2.353-1.08-4.653-1.92-6.897 1.876-.265 3.94-.196 6.199.196-.437 2.786-2.028 5.192-4.279 6.701z"/></svg>
+    </a>
+    <!-- Behance -->
+    <a href="https://behance.net" target="_blank" rel="noopener" style="color:inherit;transition:color .15s;" onmouseover="iconIn(this)" onmouseout="iconOut(this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="Behance"><path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14h-8.027c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988h-6.466v-14.967h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zm-3.466-8.988h3.584c2.508 0 2.906-3-.312-3h-3.272v3zm3.391 3h-3.391v3.016h3.341c3.055 0 2.868-3.016.05-3.016z"/></svg>
+    </a>
+    <!-- Instagram -->
+    <a href="https://instagram.com" target="_blank" rel="noopener" style="color:inherit;transition:color .15s;" onmouseover="iconIn(this)" onmouseout="iconOut(this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="Instagram"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+    <!-- Facebook -->
+    <a href="https://facebook.com" target="_blank" rel="noopener" style="color:inherit;transition:color .15s;" onmouseover="iconIn(this)" onmouseout="iconOut(this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="Facebook"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.313 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.885v2.269h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+    </a>
+    <!-- Threads -->
+    <a href="https://threads.net" target="_blank" rel="noopener" style="color:inherit;transition:color .15s;" onmouseover="iconIn(this)" onmouseout="iconOut(this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="Threads"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/></svg>
+    </a>
+    <!-- X / Twitter -->
+    <a href="https://x.com" target="_blank" rel="noopener" style="color:inherit;transition:color .15s;" onmouseover="iconIn(this)" onmouseout="iconOut(this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="X"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.745l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+    <!-- LinkedIn -->
+    <a href="https://linkedin.com" target="_blank" rel="noopener" style="color:inherit;transition:color .15s;" onmouseover="iconIn(this)" onmouseout="iconOut(this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-label="LinkedIn"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+  </div>
+  <!-- Copyright -->
+  <p class="cta-copyright" style="font-size:11px;color:rgb(180,185,192);letter-spacing:0.02em;margin-top:32px;text-align:center;width:100%;">© 2026 heysaladin</p>
+</div>
+</main>
+</div>
+<!-- Testimonials Modal -->
+<div id="testimonials-modal" role="dialog" aria-modal="true" aria-label="Testimonials">
+  <div id="testimonials-backdrop" onclick="closeTestimonialsModal()"></div>
+  <div id="testimonials-panel">
+    <div id="testimonials-header">
+      <div>
+        <div style="font-size:16px;font-weight:600;color:rgb(26,28,28);" id="modal-title">Testimonials</div>
+        <div id="modal-subtitle" style="font-size:12px;color:rgb(134,139,145);margin-top:1px;">20+ reviews from clients &amp; colleagues</div>
+      </div>
+      <button class="t-close-btn" onclick="closeTestimonialsModal()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L13 13M13 1L1 13" stroke="rgb(60,65,75)" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="testimonials-grid-wrap">
+      <div id="testimonials-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────
+let TESTIMONIALS = [];
+let currentLang = 'en';
+let translations = {};
+
+// ── Testimonial avatar stack (random on each load) ─────────────
+function renderTestimonialAvatars() {
+  const container = document.getElementById('testimonial-avatars');
+  if (!container || !TESTIMONIALS.length) return;
+  const shuffled = [...TESTIMONIALS].sort(() => Math.random() - 0.5);
+  const picks = shuffled.slice(0, 3);
+  container.innerHTML = picks.map((t, i) =>
+    `<img src="${t.image}" alt="${t.name}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;border:2px solid #f9f9f9;flex-shrink:0;position:relative;z-index:${3 - i};${i > 0 ? 'margin-left:-9px;' : ''}" onerror="this.style.background='#e2e2e2'">`
+  ).join('');
+}
+
+// ── Init: fetch both data files ────────────────────────────────
+async function init() {
+  try {
+    const [transRes, testRes] = await Promise.all([
+      fetch('./translations.json'),
+      fetch('./testimonials.json')
+    ]);
+    translations = await transRes.json();
+    TESTIMONIALS = await testRes.json();
+    renderTestimonialAvatars();
+    applyLang('en');
+  } catch(e) { console.warn('Failed to load data files', e); }
+}
+
+// ── Social icon hover (dark-mode-aware) ────────────────────────
+function iconIn(el) {
+  el.style.color = document.documentElement.classList.contains('dark') ? '#e2e2e2' : '#111113';
+}
+function iconOut(el) {
+  el.style.color = '';
+}
+
+// ── Dark mode ──────────────────────────────────────────────────
+function toggleTheme() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon-moon').style.display = isDark ? 'none' : '';
+  document.getElementById('theme-icon-sun').style.display = isDark ? '' : 'none';
+}
+// Init from localStorage
+(function() {
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (saved === 'dark' || (!saved && prefersDark)) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('theme-icon-moon').style.display = 'none';
+    document.getElementById('theme-icon-sun').style.display = '';
+  }
+})();
+
+// ── Stars renderer ─────────────────────────────────────────────
+function renderStars(rating) {
+  return Array.from({length: 5}, (_, i) => {
+    const filled = i < Math.floor(rating);
+    return `<svg width="11" height="11" viewBox="0 0 24 24" fill="${filled ? '#F59E0B' : '#E5E7EB'}" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
+  }).join('');
+}
+
+// ── Testimonials modal ─────────────────────────────────────────
+function openTestimonialsModal() {
+  const grid = document.getElementById('testimonials-grid');
+  grid.innerHTML = TESTIMONIALS.map(t => `
+    <div class="t-card">
+      <div class="t-stars">${renderStars(t.rating)}</div>
+      <p style="font-size:12.5px;line-height:1.65;color:rgb(55,60,70);flex:1;">"${t.content}"</p>
+      <div style="display:flex;align-items:center;gap:8px;padding-top:4px;">
+        <img src="${t.image}" alt="${t.name}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.background='#e2e2e2';this.src=''"/>
+        <div>
+          <div class="testimonials-name" style="font-size:12px;font-weight:600;color:rgb(39,45,54);line-height:1.3;">${t.name}</div>
+          <div class="testimonials-meta" style="font-size:11px;color:rgb(134,139,145);line-height:1.3;">${t.role} · ${t.company}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('testimonials-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTestimonialsModal() {
+  document.getElementById('testimonials-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTestimonialsModal(); });
+
+// ── Language switcher ──────────────────────────────────────────
+function applyLang(lang) {
+  const t = translations[lang];
+  if (!t) return;
+  currentLang = lang;
+  document.getElementById('lang-label').textContent = lang.toUpperCase();
+  document.getElementById('bio-text').textContent = t.bio;
+  document.getElementById('btn-email-text').textContent = t.send_email;
+  document.getElementById('btn-chat-text').textContent = t.chat_now;
+  document.getElementById('exp-title').textContent = t.working_experiences;
+  document.getElementById('testimonials-label').textContent = t.testimonials_count;
+  document.getElementById('now-badge').textContent = t.now;
+  document.getElementById('modal-title').textContent = t.testimonials_title || 'Testimonials';
+  const sub = document.getElementById('modal-subtitle');
+  if (sub && t.testimonials_subtitle) sub.textContent = t.testimonials_subtitle;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.body.style.fontFamily = lang === 'ar' ? "'Noto Kufi Arabic', sans-serif" : "'Inter', sans-serif";
+  document.querySelectorAll('.lang-option').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.lang === lang)
+  );
+}
+
+function setLang(lang) { applyLang(lang); closeLangDropdown(); }
+
+function toggleLangDropdown() {
+  const dd = document.getElementById('lang-dropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+function closeLangDropdown() {
+  const dd = document.getElementById('lang-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+
+document.addEventListener('click', e => {
+  const switcher = document.getElementById('lang-switcher');
+  if (switcher && !switcher.contains(e.target)) closeLangDropdown();
+});
+
+init();
+</script>
+</body></html>
