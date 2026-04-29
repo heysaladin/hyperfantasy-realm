@@ -82,9 +82,9 @@ export default function AdminBlogsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-wrap gap-4 justify-between items-start mb-8">
         <div>
           <h1 className="text-3xl font-bold">Blogs</h1>
           <p className="text-slate-600 dark:text-white/60 text-sm mt-1">
@@ -114,7 +114,8 @@ export default function AdminBlogsPage() {
 
       {/* Table */}
       <div className="border border-slate-300 dark:border-white/10 rounded-lg overflow-hidden mb-6">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[560px]">
           <thead className="bg-slate-100 dark:bg-white/5 border-b border-slate-300 dark:border-white/10">
             <tr>
               <th className="text-left p-4 font-semibold">Title</th>
@@ -174,6 +175,7 @@ export default function AdminBlogsPage() {
             {search ? 'No blogs match your search' : 'No blogs found'}
           </div>
         )}
+        </div>
       </div>
 
       {/* Pagination */}

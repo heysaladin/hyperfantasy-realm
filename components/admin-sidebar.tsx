@@ -31,9 +31,11 @@ const navItems = [
 interface AdminSidebarProps {
   collapsed: boolean
   setCollapsed: (v: boolean) => void
+  mobileOpen: boolean
+  setMobileOpen: (v: boolean) => void
 }
 
-export default function AdminSidebar({ collapsed, setCollapsed }: AdminSidebarProps) {
+export default function AdminSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: AdminSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -80,14 +82,12 @@ export default function AdminSidebar({ collapsed, setCollapsed }: AdminSidebarPr
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen flex flex-col bg-white dark:bg-zinc-950 border-r border-slate-200 dark:border-white/10 z-30 transition-all duration-200 ${
-        collapsed ? 'w-16' : 'w-60'
-      }`}
+      className={`fixed top-0 left-0 h-screen flex flex-col bg-white dark:bg-zinc-950 border-r border-slate-200 dark:border-white/10 z-30 transition-all duration-200 w-60 ${collapsed ? 'md:w-16' : 'md:w-60'} ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-4 border-b border-slate-200 dark:border-white/10 min-h-[60px]">
         {collapsed ? (
-          /* Collapsed: show logo only */
+          /* Collapsed: show logo only (desktop only) */
           <div className="flex items-center justify-center w-full">
             <Image
               src="/logo-pictogram.svg"
@@ -100,6 +100,7 @@ export default function AdminSidebar({ collapsed, setCollapsed }: AdminSidebarPr
           <>
             <Link
               href="/admin"
+              onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2 hover:opacity-70 transition-opacity"
             >
               <Image
@@ -114,10 +115,19 @@ export default function AdminSidebar({ collapsed, setCollapsed }: AdminSidebarPr
             </Link>
             <div className="flex items-center gap-0.5">
               <ThemeToggle />
+              {/* Desktop collapse button */}
               <button
                 onClick={() => setCollapsed(true)}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
+                className="hidden md:block p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
                 aria-label="Collapse sidebar"
+              >
+                <PanelLeftClose size={18} className="text-slate-500 dark:text-white/50" aria-hidden="true" />
+              </button>
+              {/* Mobile close button */}
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
+                aria-label="Close menu"
               >
                 <PanelLeftClose size={18} className="text-slate-500 dark:text-white/50" aria-hidden="true" />
               </button>
@@ -148,6 +158,7 @@ export default function AdminSidebar({ collapsed, setCollapsed }: AdminSidebarPr
               key={href}
               href={href}
               title={collapsed ? label : undefined}
+              onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 collapsed ? 'justify-center' : ''
               } ${

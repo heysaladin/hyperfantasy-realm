@@ -126,9 +126,9 @@ export default function AdminEnquiriesPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-wrap gap-4 justify-between items-start mb-8">
         <div>
           <h1 className="text-3xl font-bold">Enquiries</h1>
           <p className="text-slate-600 dark:text-white/60 text-sm mt-1">
@@ -150,7 +150,8 @@ export default function AdminEnquiriesPage() {
 
       {/* Table */}
       <div className="border border-slate-300 dark:border-white/10 rounded-lg overflow-hidden mb-6">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[480px]">
           <thead className="bg-slate-100 dark:bg-white/5 border-b border-slate-300 dark:border-white/10">
             <tr>
               <th className="text-left p-4 font-semibold">Name</th>
@@ -207,6 +208,7 @@ export default function AdminEnquiriesPage() {
             No enquiries found
           </div>
         )}
+        </div>
       </div>
 
       {/* Pagination */}

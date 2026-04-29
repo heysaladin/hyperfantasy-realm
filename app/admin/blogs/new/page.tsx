@@ -79,7 +79,7 @@ export default function NewBlogPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Link 
         href="/admin/blogs"
         className="inline-flex items-center text-white/60 hover:text-white transition mb-6"

@@ -148,9 +148,9 @@ export default function AdminPortfoliosPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-wrap gap-4 justify-between items-start mb-8">
         <div>
           <h1 className="text-3xl font-bold">Portfolios</h1>
           <p className="text-slate-600 dark:text-white/60 text-sm mt-1">
@@ -168,8 +168,8 @@ export default function AdminPortfoliosPage() {
       </div>
 
       {/* Search + sort + per-page */}
-      <div className="flex gap-3 mb-6">
-        <div className="relative flex-1">
+      <div className="flex flex-wrap gap-3 mb-6">
+        <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40" size={16} />
           <Input
             placeholder="Search by title or description..."
