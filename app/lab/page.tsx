@@ -27,10 +27,28 @@ const ENTRIES = [
     href: 'https://farooq-agent.web.app/',
   },
   {
-    type: 'file' as const,
+    type: 'external' as const,
     label: 'heysaladin',
     description: 'index.html',
-    href: '/lab/heysaladin/index.html',
+    href: 'https://heysaladindesign.web.app/',
+  },
+  {
+    type: 'file' as const,
+    label: 'heysaladin playful',
+    description: 'index.html',
+    href: '/lab/heysaladin-design-playful/index.html',
+  },
+  {
+    type: 'external' as const,
+    label: 'colab',
+    description: 'Collaboration Space',
+    href: 'https://heysaladinme.web.app/colab/',
+  },
+  {
+    type: 'external' as const,
+    label: 'ikhbar',
+    description: 'Newsletter Creator',
+    href: 'https://heysaladinme.web.app/ikhbar',
   },
 ]
 
