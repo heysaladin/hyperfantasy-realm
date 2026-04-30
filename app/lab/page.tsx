@@ -27,12 +27,6 @@ const ENTRIES = [
     href: 'https://farooq-agent.web.app/',
   },
   {
-    type: 'external' as const,
-    label: 'heysaladin',
-    description: 'index.html',
-    href: 'https://heysaladindesign.web.app/',
-  },
-  {
     type: 'file' as const,
     label: 'heysaladin playful',
     description: 'index.html',
