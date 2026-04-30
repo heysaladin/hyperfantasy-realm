@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { FileText, Search, SearchX, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ArticleContent } from '@/components/article-content'
 import { resolveContent } from '@/lib/tiptap-content'
+import { createClient } from '@/lib/supabase/client'
 
 const PAGE_SIZE = 6
 
@@ -14,7 +15,16 @@ export default function ArticlesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [showDrafts, setShowDrafts] = useState(false)
   const searchBarRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsAdmin(!!user)
+    })
+  }, [])
 
   useEffect(() => {
     fetch('/api/blogs')
@@ -25,7 +35,7 @@ export default function ArticlesPage() {
   }, [])
 
   const filtered = useMemo(() => {
-    let result = allBlogs.filter(b => b.isPublished)
+    let result = isAdmin && showDrafts ? allBlogs : allBlogs.filter(b => b.isPublished)
     if (!search.trim()) return result
     const q = search.trim().toLowerCase()
     return result.filter(b =>
@@ -33,7 +43,7 @@ export default function ArticlesPage() {
       b.tags?.some((t: string) => t.toLowerCase().includes(q)) ||
       b.excerpt?.toLowerCase().includes(q)
     )
-  }, [allBlogs, search])
+  }, [allBlogs, search, isAdmin, showDrafts])
 
   // Reset to page 1 when search changes
   useEffect(() => { setPage(1) }, [search])
@@ -84,7 +94,7 @@ export default function ArticlesPage() {
       {/* Search bar */}
       <div ref={searchBarRef} className="border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-black/95 sticky z-10 backdrop-blur-sm transition-[top] duration-300"
         style={{ top: 'calc(var(--nav-offset, 0px) + 64px)' }}>
-        <div className="max-w-5xl mx-auto px-6 lg:px-8 py-3">
+        <div className="max-w-5xl mx-auto px-6 lg:px-8 py-3 flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/30" aria-hidden="true" />
             <label htmlFor="articles-search" className="sr-only">Search articles</label>
@@ -106,6 +116,22 @@ export default function ArticlesPage() {
               </button>
             )}
           </div>
+          {isAdmin && (
+            <label className="flex-shrink-0 flex items-center gap-2 cursor-pointer select-none">
+              <span className="text-xs font-medium text-slate-500 dark:text-white/40">Drafts</span>
+              <span
+                onClick={() => setShowDrafts(v => !v)}
+                role="switch"
+                aria-checked={showDrafts}
+                className={`relative inline-flex h-5 w-9 rounded-full transition-colors duration-200 ${showDrafts ? 'bg-amber-400' : 'bg-slate-300 dark:bg-white/20'}`}
+              >
+                <span
+                  className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200"
+                  style={{ transform: showDrafts ? 'translateX(16px)' : 'translateX(0px)' }}
+                />
+              </span>
+            </label>
+          )}
         </div>
       </div>
 
@@ -132,8 +158,8 @@ export default function ArticlesPage() {
             {paginated.map((blog: any) => (
               <Link key={blog.id} href={`/articles/${blog.slug}`} className="block group py-10 first:pt-0">
                 <article className="flex flex-col md:flex-row gap-8">
-                  <div className="md:w-2/5 aspect-video overflow-hidden rounded-lg bg-slate-200 dark:bg-white/5 flex-shrink-0">
-                    {blog.coverImage?.startsWith('https://') ? (
+                  <div className="md:w-2/5 aspect-video overflow-hidden rounded-lg bg-slate-200 dark:bg-white/5 flex-shrink-0 relative">
+                    {blog.coverImage ? (
                       <Image
                         src={blog.coverImage}
                         alt={blog.title}
@@ -143,6 +169,11 @@ export default function ArticlesPage() {
                       />
                     ) : (
                       <div className="w-full h-full bg-slate-200 dark:bg-white/5" />
+                    )}
+                    {!blog.isPublished && (
+                      <span className="absolute top-2 left-2 text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-400/90 text-amber-900">
+                        Draft
+                      </span>
                     )}
                   </div>
                   <div className="flex-1">
