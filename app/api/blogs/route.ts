@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
         coverImage: body.coverImage || null,
         tags: body.tags || [],
         isPublished: body.isPublished || false,
+        index: body.index ?? 0,
         authorId: creator?.id ?? null,
       }
     })

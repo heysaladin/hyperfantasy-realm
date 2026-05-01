@@ -39,6 +39,7 @@ export default function EditBlogPage({
     coverImage: '',
     tags: [] as string[],
     isPublished: false,
+    index: 0,
   })
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function EditBlogPage({
           coverImage: blog.coverImage || '',
           tags: Array.isArray(blog.tags) ? blog.tags : [],
           isPublished: blog.isPublished || false,
+          index: blog.index ?? 0,
         })
       }
       setFetching(false)
@@ -85,6 +87,7 @@ export default function EditBlogPage({
         coverImage: formData.coverImage || null,
         tags: formData.tags,
         isPublished: formData.isPublished,
+        index: formData.index,
       }
 
       const res = await fetch(`/api/blogs/${id}`, {
@@ -195,6 +198,19 @@ export default function EditBlogPage({
             className="bg-slate-50 dark:bg-white/5"
             placeholder="https://images.unsplash.com/..."
           />
+        </div>
+
+        {/* Index */}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="index">Index</Label>
+          <Input
+            id="index"
+            type="number"
+            value={formData.index}
+            onChange={(e) => setFormData({...formData, index: parseInt(e.target.value) || 0})}
+            className="bg-slate-50 dark:bg-white/5 w-32"
+          />
+          <p className="text-xs text-slate-400 dark:text-white/30">≥1 pins to top · 0 normal · ≤−1 sinks to last page</p>
         </div>
 
         {/* Tags */}

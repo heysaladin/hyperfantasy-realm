@@ -33,6 +33,7 @@ export default function NewBlogPage() {
     coverImage: '',
     tags: [] as string[],
     isPublished: false,
+    index: 0,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,6 +49,7 @@ export default function NewBlogPage() {
         coverImage: formData.coverImage || null,
         tags: formData.tags,
         isPublished: formData.isPublished,
+        index: formData.index,
       }
 
       console.log('Sending payload:', payload)
@@ -162,6 +164,19 @@ export default function NewBlogPage() {
             className="bg-slate-50 dark:bg-white/5"
             placeholder="https://images.unsplash.com/..."
           />
+        </div>
+
+        {/* Index */}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="index">Index</Label>
+          <Input
+            id="index"
+            type="number"
+            value={formData.index}
+            onChange={(e) => setFormData({...formData, index: parseInt(e.target.value) || 0})}
+            className="bg-slate-50 dark:bg-white/5 w-32"
+          />
+          <p className="text-xs text-slate-400 dark:text-white/30">≥1 pins to top · 0 normal · ≤−1 sinks to last page</p>
         </div>
 
         {/* Tags */}

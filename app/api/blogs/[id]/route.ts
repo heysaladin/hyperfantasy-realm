@@ -28,6 +28,7 @@ export async function PUT(
         coverImage: body.coverImage || null,
         tags: body.tags || [],
         isPublished: body.isPublished || false,
+        ...(body.index !== undefined && { index: Number(body.index) }),
       }
     })
     

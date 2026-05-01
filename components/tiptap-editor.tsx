@@ -9,11 +9,13 @@ import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import TextAlign from '@tiptap/extension-text-align'
 import Placeholder from '@tiptap/extension-placeholder'
+import { Table, TableRow, TableHeader, TableCell } from '@tiptap/extension-table'
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Code, Undo, Redo,
-  AlignLeft, AlignCenter, AlignRight, Link as LinkIcon
+  AlignLeft, AlignCenter, AlignRight, Link as LinkIcon,
+  Grid, Trash2, Plus
 } from 'lucide-react'
 
 interface TiptapEditorProps {
@@ -52,7 +54,7 @@ function ToolbarButton({
 export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ link: false, underline: false }),
       Underline,
       Image,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
@@ -60,6 +62,10 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
       Placeholder.configure({
         placeholder: placeholder ?? 'Write your content here…',
       }),
+      Table.configure({ resizable: false }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     immediatelyRender: false,
     content: (() => {
@@ -230,7 +236,110 @@ export function TiptapEditor({ value, onChange, placeholder }: TiptapEditorProps
         >
           <LinkIcon size={15} />
         </ToolbarButton>
+
+        <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1" />
+
+        {/* Table — insert */}
+        <ToolbarButton
+          title="Insert Table"
+          active={editor.isActive('table')}
+          onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+        >
+          <Grid size={15} />
+        </ToolbarButton>
+
+        {/* Table controls — only visible when inside a table */}
+        {editor.isActive('table') && (
+          <>
+            <ToolbarButton title="Add column before" onClick={() => editor.chain().focus().addColumnBefore().run()}>
+              <Plus size={13} />
+              <span className="text-[10px] leading-none">C←</span>
+            </ToolbarButton>
+            <ToolbarButton title="Add column after" onClick={() => editor.chain().focus().addColumnAfter().run()}>
+              <Plus size={13} />
+              <span className="text-[10px] leading-none">C→</span>
+            </ToolbarButton>
+            <ToolbarButton title="Delete column" onClick={() => editor.chain().focus().deleteColumn().run()}>
+              <Trash2 size={13} />
+              <span className="text-[10px] leading-none">Col</span>
+            </ToolbarButton>
+            <ToolbarButton title="Add row before" onClick={() => editor.chain().focus().addRowBefore().run()}>
+              <Plus size={13} />
+              <span className="text-[10px] leading-none">R↑</span>
+            </ToolbarButton>
+            <ToolbarButton title="Add row after" onClick={() => editor.chain().focus().addRowAfter().run()}>
+              <Plus size={13} />
+              <span className="text-[10px] leading-none">R↓</span>
+            </ToolbarButton>
+            <ToolbarButton title="Delete row" onClick={() => editor.chain().focus().deleteRow().run()}>
+              <Trash2 size={13} />
+              <span className="text-[10px] leading-none">Row</span>
+            </ToolbarButton>
+            <ToolbarButton title="Delete table" onClick={() => editor.chain().focus().deleteTable().run()}>
+              <Trash2 size={13} />
+              <span className="text-[10px] leading-none">Tbl</span>
+            </ToolbarButton>
+            <ToolbarButton title="Merge cells" onClick={() => editor.chain().focus().mergeCells().run()}>
+              <span className="text-[10px] leading-none font-medium">Merge</span>
+            </ToolbarButton>
+            <ToolbarButton title="Split cell" onClick={() => editor.chain().focus().splitCell().run()}>
+              <span className="text-[10px] leading-none font-medium">Split</span>
+            </ToolbarButton>
+          </>
+        )}
       </div>
+
+      {/* Table styles */}
+      <style>{`
+        .tiptap-content table {
+          border-collapse: collapse;
+          width: 100%;
+          margin: 1.5em 0;
+          font-size: 0.9em;
+          overflow: hidden;
+          border-radius: 4px;
+          border: 1px solid #e2e8f0;
+        }
+        .dark .tiptap-content table {
+          border-color: rgba(255,255,255,0.12);
+        }
+        .tiptap-content th,
+        .tiptap-content td {
+          border: 1px solid #e2e8f0;
+          padding: 8px 12px;
+          vertical-align: top;
+          position: relative;
+          min-width: 60px;
+        }
+        .dark .tiptap-content th,
+        .dark .tiptap-content td {
+          border-color: rgba(255,255,255,0.12);
+        }
+        .tiptap-content th {
+          background: #f8fafc;
+          font-weight: 600;
+          text-align: left;
+        }
+        .dark .tiptap-content th {
+          background: rgba(255,255,255,0.06);
+        }
+        .tiptap-content .selectedCell::after {
+          background: rgba(99,102,241,0.15);
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        .tiptap-content .column-resize-handle {
+          background-color: #6366f1;
+          bottom: -2px;
+          pointer-events: none;
+          position: absolute;
+          right: -2px;
+          top: 0;
+          width: 3px;
+        }
+      `}</style>
 
       {/* Editor area */}
       <EditorContent editor={editor} />

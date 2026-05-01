@@ -54,6 +54,10 @@ function nodeToHtml(node: TiptapNode): string {
       const title = node.attrs?.title ? ` title="${node.attrs.title}"` : ''
       return `<figure style="margin:1em 0;text-align:center;"><img src="${src}" alt="${alt}"${title} data-responsive-img style="display:inline-block;height:auto;max-width:100%;border-radius:0.5rem;" /></figure>`
     }
+    case 'table':      return `<table>${inner}</table>`
+    case 'tableRow':   return `<tr>${inner}</tr>`
+    case 'tableHeader':return `<th>${inner}</th>`
+    case 'tableCell':  return `<td>${inner}</td>`
     default:              return inner
   }
 }
